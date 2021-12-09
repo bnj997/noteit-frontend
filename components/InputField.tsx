@@ -22,7 +22,7 @@ const InputField: React.FC<InputFieldProps> = ({
 
   return (
     <Box mt={4}>
-      <FormControl>
+      <FormControl isInvalid={!!error}>
         <FormLabel htmlFor={field.name}>{label}</FormLabel>
         <Input
           {...field}
