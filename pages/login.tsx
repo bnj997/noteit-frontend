@@ -3,47 +3,41 @@ import { Formik, Form } from "formik";
 import React from "react";
 import InputField from "../components/InputField";
 import Wrapper from "../components/Wrapper";
-import { MeDocument, MeQuery, useRegisterMutation } from "../generated/graphql";
+import { MeDocument, MeQuery, useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import * as Yup from "yup";
 import Router from "next/router";
 
-interface registerProps {}
-
-const RegisterSchema = Yup.object().shape({
-  email: Yup.string()
-    .email("Invalid email address")
-    .required("Please enter an email address"),
-  password: Yup.string()
-    .min(6, "Password must be at least 6 characters in length")
-    .required("Please enter a password"),
+const LoginSchema = Yup.object().shape({
+  email: Yup.string().required("Please enter an email address"),
+  password: Yup.string().required("Please enter a password"),
 });
 
-const Register: React.FC<{}> = ({}) => {
-  const [register] = useRegisterMutation();
+const Login: React.FC<{}> = ({}) => {
+  const [login] = useLoginMutation();
 
   return (
     <Wrapper variant="small">
       <Formik
         initialValues={{ email: "", password: "" }}
-        validationSchema={RegisterSchema}
+        validationSchema={LoginSchema}
         onSubmit={async (values, { setErrors, resetForm }) => {
-          const response = await register({
+          const response = await login({
             variables: values,
             update: (cache, { data }) => {
               cache.writeQuery<MeQuery>({
                 query: MeDocument,
                 data: {
                   __typename: "Query",
-                  me: data?.register.user,
+                  me: data?.login.user,
                 },
               });
               cache.evict({ fieldName: "notes:{}" });
             },
           });
-          if (response.data?.register.errors) {
-            setErrors(toErrorMap(response.data.register.errors));
-          } else if (response.data?.register.user) {
+          if (response.data?.login.errors) {
+            setErrors(toErrorMap(response.data.login.errors));
+          } else if (response.data?.login.user) {
             resetForm();
             Router.push("/");
           }
@@ -72,7 +66,7 @@ const Register: React.FC<{}> = ({}) => {
               colorScheme="teal"
               type="submit"
             >
-              Register
+              Login
             </Button>
           </Form>
         )}
@@ -81,4 +75,4 @@ const Register: React.FC<{}> = ({}) => {
   );
 };
 
-export default Register;
+export default Login;

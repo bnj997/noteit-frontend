@@ -11,6 +11,7 @@ import React, { InputHTMLAttributes } from "react";
 type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   label: string;
   name: string;
+  touched: boolean | undefined;
 };
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -30,7 +31,9 @@ const InputField: React.FC<InputFieldProps> = ({
           id={field.name}
           placeholder={props.placeholder}
         />
-        {error ? <FormErrorMessage>{error}</FormErrorMessage> : null}
+        {error && props.touched ? (
+          <FormErrorMessage>{error}</FormErrorMessage>
+        ) : null}
       </FormControl>
     </Box>
   );
