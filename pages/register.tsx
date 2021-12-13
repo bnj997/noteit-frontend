@@ -7,6 +7,7 @@ import { MeDocument, MeQuery, useRegisterMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import * as Yup from "yup";
 import Router from "next/router";
+import { withApollo } from "../utils/withApollo";
 
 interface registerProps {}
 
@@ -81,4 +82,4 @@ const Register: React.FC<{}> = ({}) => {
   );
 };
 
-export default Register;
+export default withApollo({ ssr: false })(Register);

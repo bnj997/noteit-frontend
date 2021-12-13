@@ -7,6 +7,7 @@ import { MeDocument, MeQuery, useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import * as Yup from "yup";
 import Router from "next/router";
+import { withApollo } from "../utils/withApollo";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().required("Please enter an email address"),
@@ -75,4 +76,4 @@ const Login: React.FC<{}> = ({}) => {
   );
 };
 
-export default Login;
+export default withApollo({ ssr: false })(Login);
