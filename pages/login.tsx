@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/react";
+import { Button, Flex, Link as UILink } from "@chakra-ui/react";
 import { Formik, Form } from "formik";
 import React from "react";
 import InputField from "../components/InputField";
@@ -6,8 +6,9 @@ import Wrapper from "../components/Wrapper";
 import { MeDocument, MeQuery, useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import * as Yup from "yup";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import { withApollo } from "../utils/withApollo";
+import Link from "next/link";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().required("Please enter an email address"),
@@ -15,6 +16,7 @@ const LoginSchema = Yup.object().shape({
 });
 
 const Login: React.FC<{}> = ({}) => {
+  const router = useRouter();
   const [login] = useLoginMutation();
 
   return (
@@ -40,7 +42,7 @@ const Login: React.FC<{}> = ({}) => {
             setErrors(toErrorMap(response.data.login.errors));
           } else if (response.data?.login.user) {
             resetForm();
-            Router.push("/");
+            router.push("/");
           }
         }}
       >
@@ -60,6 +62,14 @@ const Login: React.FC<{}> = ({}) => {
               type="password"
               touched={touched.password}
             />
+            <Flex mt={2}>
+              <Link href="/forgot-password" passHref>
+                <UILink ml={"auto"} color={"black"} mr={4}>
+                  Forgot Password?
+                </UILink>
+              </Link>
+            </Flex>
+
             <Button
               mt={4}
               isDisabled={!isValid}
