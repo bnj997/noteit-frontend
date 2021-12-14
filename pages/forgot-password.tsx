@@ -1,18 +1,11 @@
-import { Box, Button } from "@chakra-ui/react";
+import { Box, Button, Stack } from "@chakra-ui/react";
 import { Formik, Form } from "formik";
-import router from "next/router";
 import React, { useState } from "react";
-import * as Yup from "yup";
 import InputField from "../components/InputField";
-import Wrapper from "../components/Wrapper";
-import {
-  MeQuery,
-  MeDocument,
-  useForgotPasswordMutation,
-} from "../generated/graphql";
-import { toErrorMap } from "../utils/toErrorMap";
+import { useForgotPasswordMutation } from "../generated/graphql";
+import * as Yup from "yup";
 import { withApollo } from "../utils/withApollo";
-import login from "./login";
+import AuthForm from "../components/AuthForm";
 
 const ForgotPasswordSchema = Yup.object().shape({
   email: Yup.string()
@@ -23,8 +16,9 @@ const ForgotPasswordSchema = Yup.object().shape({
 const ForgotPassword: React.FC<{}> = ({}) => {
   const [complete, setComplete] = useState(false);
   const [forgotPassword] = useForgotPasswordMutation();
+
   return (
-    <Wrapper variant="small">
+    <AuthForm title="Forgot your password?" subtitle="We got you covered">
       <Formik
         initialValues={{ email: "" }}
         validationSchema={ForgotPasswordSchema}
@@ -39,30 +33,32 @@ const ForgotPassword: React.FC<{}> = ({}) => {
       >
         {({ isSubmitting, touched, isValid }) =>
           complete ? (
-            <Box>We have sent an email to that address</Box>
+            <Box textAlign="center">We have sent an email to that address.</Box>
           ) : (
             <Form>
-              <InputField
-                name="email"
-                placeholder="email"
-                label="Email"
-                type="email"
-                touched={touched.email}
-              />
-              <Button
-                mt={4}
-                isDisabled={!isValid}
-                isLoading={isSubmitting}
-                colorScheme="teal"
-                type="submit"
-              >
-                Confirm Email
-              </Button>
+              <Stack spacing="6">
+                <InputField
+                  name="email"
+                  placeholder="email"
+                  label="Email"
+                  type="email"
+                  touched={touched.email}
+                />
+                <Button
+                  mt={4}
+                  isDisabled={!isValid}
+                  isLoading={isSubmitting}
+                  colorScheme="teal"
+                  type="submit"
+                >
+                  Confirm Email
+                </Button>
+              </Stack>
             </Form>
           )
         }
       </Formik>
-    </Wrapper>
+    </AuthForm>
   );
 };
 

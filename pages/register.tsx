@@ -1,17 +1,21 @@
-import { Button } from "@chakra-ui/react";
+import { Button, Stack } from "@chakra-ui/react";
 import { Formik, Form } from "formik";
 import React from "react";
 import InputField from "../components/InputField";
-import Wrapper from "../components/Wrapper";
 import { MeDocument, MeQuery, useRegisterMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import * as Yup from "yup";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import { withApollo } from "../utils/withApollo";
+import PasswordInputField from "../components/PasswordInputField";
+import AuthForm from "../components/AuthForm";
 
 interface registerProps {}
 
 const RegisterSchema = Yup.object().shape({
+  username: Yup.string()
+    .min(5, "Username must be at least 5 characters in length")
+    .required("Please enter your username"),
   email: Yup.string()
     .email("Invalid email address")
     .required("Please enter an email address"),
@@ -21,12 +25,18 @@ const RegisterSchema = Yup.object().shape({
 });
 
 const Register: React.FC<{}> = ({}) => {
+  const router = useRouter();
   const [register] = useRegisterMutation();
 
   return (
-    <Wrapper variant="small">
+    <AuthForm
+      title="Register to use Noteit"
+      subtitle="Already have an account"
+      link="login"
+      linkTitle="Sign in here"
+    >
       <Formik
-        initialValues={{ email: "", password: "" }}
+        initialValues={{ username: "", email: "", password: "" }}
         validationSchema={RegisterSchema}
         onSubmit={async (values, { setErrors, resetForm }) => {
           const response = await register({
@@ -46,39 +56,49 @@ const Register: React.FC<{}> = ({}) => {
             setErrors(toErrorMap(response.data.register.errors));
           } else if (response.data?.register.user) {
             resetForm();
-            Router.push("/");
+            router.push("/");
           }
         }}
       >
         {({ isSubmitting, touched, isValid }) => (
           <Form>
-            <InputField
-              name="email"
-              placeholder="email"
-              label="Email"
-              type="email"
-              touched={touched.email}
-            />
-            <InputField
-              name="password"
-              placeholder="password"
-              label="Password"
-              type="password"
-              touched={touched.password}
-            />
-            <Button
-              mt={4}
-              isDisabled={!isValid}
-              isLoading={isSubmitting}
-              colorScheme="teal"
-              type="submit"
-            >
-              Register
-            </Button>
+            <Stack spacing="6">
+              <InputField
+                name="username"
+                placeholder="username"
+                label="Username"
+                required
+                touched={touched.username}
+              />
+              <InputField
+                name="email"
+                placeholder="email"
+                label="Email"
+                required
+                touched={touched.email}
+              />
+              <PasswordInputField
+                label="Password"
+                name="password"
+                touched={touched.password}
+                showForgot={false}
+              />
+              <Button
+                mt={4}
+                size="lg"
+                fontSize="md"
+                isDisabled={!isValid}
+                isLoading={isSubmitting}
+                colorScheme="teal"
+                type="submit"
+              >
+                Login
+              </Button>
+            </Stack>
           </Form>
         )}
       </Formik>
-    </Wrapper>
+    </AuthForm>
   );
 };
 
