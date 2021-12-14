@@ -21,7 +21,7 @@ const ChangePasswordSchema = Yup.object().shape({
     .required("Please enter a password"),
   confirmNewPassword: Yup.string()
     .test("passwords-match", "Passwords must match", function (value) {
-      return this.parent.password === value;
+      return this.parent.newPassword === value;
     })
     .required("Please enter a password"),
 });
