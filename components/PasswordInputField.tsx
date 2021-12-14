@@ -20,7 +20,7 @@ import Link from "next/link";
 
 type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   touched: boolean | undefined;
-  showForgot: boolean;
+  showforgot: boolean;
   name: string;
   label: string;
 };
@@ -57,7 +57,7 @@ const PasswordInputField: React.FC<InputFieldProps> = ({
           fontWeight="semibold"
           fontSize="sm"
         >
-          {props.showForgot && (
+          {props.showforgot && (
             <Link href="/forgot-password" passHref>
               <UILink ml={"auto"} color="teal" mr={4}>
                 Forgot Password?

@@ -19,10 +19,11 @@ const ChangePasswordSchema = Yup.object().shape({
   newPassword: Yup.string()
     .min(6, "Password must be at least 6 characters in length")
     .required("Please enter a password"),
-  confirmNewPassword: Yup.string().oneOf(
-    [Yup.ref("newPassword"), null],
-    "Passwords must match"
-  ),
+  confirmNewPassword: Yup.string()
+    .test("passwords-match", "Passwords must match", function (value) {
+      return this.parent.password === value;
+    })
+    .required("Please enter a password"),
 });
 
 const ChangePassword: NextPage = () => {
@@ -71,13 +72,13 @@ const ChangePassword: NextPage = () => {
               <PasswordInputField
                 label="New password"
                 name="newPassword"
-                showForgot={false}
+                showforgot={false}
                 touched={touched.confirmNewPassword}
               />
               <PasswordInputField
                 label="Confirm new password"
                 name="confirmNewPassword"
-                showForgot={false}
+                showforgot={false}
                 touched={touched.confirmNewPassword}
               />
               {tokenError ? (
