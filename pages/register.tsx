@@ -22,6 +22,11 @@ const RegisterSchema = Yup.object().shape({
   password: Yup.string()
     .min(6, "Password must be at least 6 characters in length")
     .required("Please enter a password"),
+  confirmPassword: Yup.string()
+    .test("passwords-match", "Passwords must match", function (value) {
+      return this.parent.password === value;
+    })
+    .required("Please enter a password"),
 });
 
 const Register: React.FC<{}> = ({}) => {
@@ -36,7 +41,12 @@ const Register: React.FC<{}> = ({}) => {
       linkTitle="Sign in here"
     >
       <Formik
-        initialValues={{ username: "", email: "", password: "" }}
+        initialValues={{
+          username: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        }}
         validationSchema={RegisterSchema}
         onSubmit={async (values, { setErrors, resetForm }) => {
           const response = await register({
@@ -81,7 +91,13 @@ const Register: React.FC<{}> = ({}) => {
                 label="Password"
                 name="password"
                 touched={touched.password}
-                showForgot={false}
+                showforgot={false}
+              />
+              <PasswordInputField
+                label="Confirm password"
+                name="confirmPassword"
+                touched={touched.password}
+                showforgot={false}
               />
               <Button
                 mt={4}

@@ -62,9 +62,10 @@ const Login: React.FC<{}> = ({}) => {
                 touched={touched.username}
               />
               <PasswordInputField
+                label="Password"
                 name="password"
                 touched={touched.password}
-                showForgot={true}
+                showforgot={true}
               />
               <Button
                 mt={4}

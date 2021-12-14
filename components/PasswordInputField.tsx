@@ -9,24 +9,26 @@ import {
   InputRightElement,
   useDisclosure,
   useColorModeValue as mode,
-  Link as UILink,
+  Link,
   FormErrorMessage,
 } from "@chakra-ui/react";
 import * as React from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useField } from "formik";
 import { InputHTMLAttributes } from "react";
-import Link from "next/link";
+import NextLink from "next/link";
 
 type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   touched: boolean | undefined;
-  showForgot: boolean;
+  showforgot: boolean;
   name: string;
   label: string;
 };
 
 const PasswordInputField: React.FC<InputFieldProps> = ({
   size: _,
+  showforgot,
+  touched,
   ...props
 }) => {
   const { isOpen, onToggle } = useDisclosure();
@@ -50,18 +52,17 @@ const PasswordInputField: React.FC<InputFieldProps> = ({
   return (
     <FormControl isInvalid={!!error}>
       <Flex justify="space-between">
-        <FormLabel>{props.label}</FormLabel>
+        <FormLabel id={field.name} htmlFor={field.name}>
+          {props.label}
+        </FormLabel>
         <Box
-          as="a"
-          color={mode("red.600", "red.200")}
+          color={mode("teal.600", "teal.200")}
           fontWeight="semibold"
           fontSize="sm"
         >
-          {props.showForgot && (
-            <Link href="/forgot-password" passHref>
-              <UILink ml={"auto"} color="teal" mr={4}>
-                Forgot Password?
-              </UILink>
+          {showforgot && (
+            <Link as={NextLink} ml={"auto"} href="/forgot-password">
+              Forgot Password?
             </Link>
           )}
         </Box>
@@ -79,15 +80,14 @@ const PasswordInputField: React.FC<InputFieldProps> = ({
         <Input
           {...props}
           {...field}
+          id={field.name}
           placeholder="password"
           type={isOpen ? "text" : "password"}
           autoComplete="current-password"
           required
         />
       </InputGroup>
-      {error && props.touched ? (
-        <FormErrorMessage>{error}</FormErrorMessage>
-      ) : null}
+      {error && touched ? <FormErrorMessage>{error}</FormErrorMessage> : null}
     </FormControl>
   );
 };
