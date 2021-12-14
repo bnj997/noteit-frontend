@@ -77,7 +77,12 @@ const Register: React.FC<{}> = ({}) => {
                 required
                 touched={touched.email}
               />
-              <PasswordInputField name="password" touched={touched.password} />
+              <PasswordInputField
+                label="Password"
+                name="password"
+                touched={touched.password}
+                showForgot={false}
+              />
               <Button
                 mt={4}
                 size="lg"

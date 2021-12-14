@@ -61,7 +61,11 @@ const Login: React.FC<{}> = ({}) => {
                 required
                 touched={touched.username}
               />
-              <PasswordInputField name="password" touched={touched.password} />
+              <PasswordInputField
+                name="password"
+                touched={touched.password}
+                showForgot={true}
+              />
               <Button
                 mt={4}
                 size="lg"

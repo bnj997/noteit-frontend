@@ -11,7 +11,7 @@ import { Card } from "./Card";
 
 interface AuthFormProps {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   link?: string;
   linkTitle?: string;
 }

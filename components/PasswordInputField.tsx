@@ -20,7 +20,9 @@ import Link from "next/link";
 
 type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   touched: boolean | undefined;
+  showForgot: boolean;
   name: string;
+  label: string;
 };
 
 const PasswordInputField: React.FC<InputFieldProps> = ({
@@ -48,18 +50,20 @@ const PasswordInputField: React.FC<InputFieldProps> = ({
   return (
     <FormControl isInvalid={!!error}>
       <Flex justify="space-between">
-        <FormLabel>Password</FormLabel>
+        <FormLabel>{props.label}</FormLabel>
         <Box
           as="a"
           color={mode("red.600", "red.200")}
           fontWeight="semibold"
           fontSize="sm"
         >
-          <Link href="/forgot-password" passHref>
-            <UILink ml={"auto"} color="teal" mr={4}>
-              Forgot Password?
-            </UILink>
-          </Link>
+          {props.showForgot && (
+            <Link href="/forgot-password" passHref>
+              <UILink ml={"auto"} color="teal" mr={4}>
+                Forgot Password?
+              </UILink>
+            </Link>
+          )}
         </Box>
       </Flex>
       <InputGroup>

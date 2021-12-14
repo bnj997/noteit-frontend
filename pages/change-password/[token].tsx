@@ -1,9 +1,7 @@
-import { Box, Button, Flex, Link as UILink } from "@chakra-ui/react";
+import { Box, Button, Flex, Link as UILink, Stack } from "@chakra-ui/react";
 import { Formik, Form } from "formik";
 import { NextPage } from "next";
 import React, { useState } from "react";
-import InputField from "../../components/InputField";
-import Wrapper from "../../components/Wrapper";
 import { toErrorMap } from "../../utils/toErrorMap";
 import * as Yup from "yup";
 import { useRouter } from "next/router";
@@ -14,11 +12,17 @@ import {
 } from "../../generated/graphql";
 import Link from "next/link";
 import { withApollo } from "../../utils/withApollo";
+import AuthForm from "../../components/AuthForm";
+import PasswordInputField from "../../components/PasswordInputField";
 
 const ChangePasswordSchema = Yup.object().shape({
   newPassword: Yup.string()
     .min(6, "Password must be at least 6 characters in length")
     .required("Please enter a password"),
+  confirmNewPassword: Yup.string().oneOf(
+    [Yup.ref("newPassword"), null],
+    "Passwords must match"
+  ),
 });
 
 const ChangePassword: NextPage = () => {
@@ -26,9 +30,9 @@ const ChangePassword: NextPage = () => {
   const [changePassword] = useChangePasswordMutation();
   const [tokenError, setTokenError] = useState("");
   return (
-    <Wrapper variant="small">
+    <AuthForm title="Change Password">
       <Formik
-        initialValues={{ newPassword: "" }}
+        initialValues={{ confirmNewPassword: "" }}
         validationSchema={ChangePasswordSchema}
         onSubmit={async (values, { setErrors, resetForm }) => {
           const response = await changePassword({
@@ -37,7 +41,7 @@ const ChangePassword: NextPage = () => {
                 typeof router.query.token === "string"
                   ? router.query.token
                   : "",
-              newPassword: values.newPassword,
+              newPassword: values.confirmNewPassword,
             },
             update: (cache, { data }) => {
               cache.writeQuery<MeQuery>({
@@ -63,36 +67,43 @@ const ChangePassword: NextPage = () => {
       >
         {({ isSubmitting, touched, isValid }) => (
           <Form>
-            <InputField
-              name="newPassword"
-              placeholder="password"
-              label="New Password"
-              type="password"
-              touched={touched.newPassword}
-            />
-            {tokenError ? (
-              <Flex>
-                <Box mr={2} style={{ color: "red" }}>
-                  {tokenError}
-                </Box>
-                <Link href="/forgot-password" passHref>
-                  <UILink>Click here to get a new one</UILink>
-                </Link>
-              </Flex>
-            ) : null}
-            <Button
-              mt={4}
-              isDisabled={!isValid}
-              isLoading={isSubmitting}
-              colorScheme="teal"
-              type="submit"
-            >
-              Change Password
-            </Button>
+            <Stack spacing="6">
+              <PasswordInputField
+                label="New password"
+                name="newPassword"
+                showForgot={false}
+                touched={touched.confirmNewPassword}
+              />
+              <PasswordInputField
+                label="Confirm new password"
+                name="confirmNewPassword"
+                showForgot={false}
+                touched={touched.confirmNewPassword}
+              />
+              {tokenError ? (
+                <Flex>
+                  <Box mr={2} style={{ color: "red" }}>
+                    {tokenError}
+                  </Box>
+                  <Link href="/forgot-password" passHref>
+                    <UILink>Click here to get a new one</UILink>
+                  </Link>
+                </Flex>
+              ) : null}
+              <Button
+                mt={4}
+                isDisabled={!isValid}
+                isLoading={isSubmitting}
+                colorScheme="teal"
+                type="submit"
+              >
+                Change Password
+              </Button>
+            </Stack>
           </Form>
         )}
       </Formik>
-    </Wrapper>
+    </AuthForm>
   );
 };
 
