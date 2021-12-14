@@ -16,6 +16,7 @@ type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
 const InputField: React.FC<InputFieldProps> = ({
   label,
   size: _,
+  touched,
   ...props
 }) => {
   const [field, { error }] = useField(props);
@@ -29,9 +30,7 @@ const InputField: React.FC<InputFieldProps> = ({
         id={field.name}
         placeholder={props.placeholder}
       />
-      {error && props.touched ? (
-        <FormErrorMessage>{error}</FormErrorMessage>
-      ) : null}
+      {error && touched ? <FormErrorMessage>{error}</FormErrorMessage> : null}
     </FormControl>
   );
 };

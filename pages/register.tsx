@@ -41,7 +41,12 @@ const Register: React.FC<{}> = ({}) => {
       linkTitle="Sign in here"
     >
       <Formik
-        initialValues={{ username: "", email: "", password: "" }}
+        initialValues={{
+          username: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        }}
         validationSchema={RegisterSchema}
         onSubmit={async (values, { setErrors, resetForm }) => {
           const response = await register({

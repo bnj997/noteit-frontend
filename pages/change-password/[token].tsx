@@ -33,7 +33,7 @@ const ChangePassword: NextPage = () => {
   return (
     <AuthForm title="Change Password">
       <Formik
-        initialValues={{ confirmNewPassword: "" }}
+        initialValues={{ newPassword: "", confirmNewPassword: "" }}
         validationSchema={ChangePasswordSchema}
         onSubmit={async (values, { setErrors, resetForm }) => {
           const response = await changePassword({

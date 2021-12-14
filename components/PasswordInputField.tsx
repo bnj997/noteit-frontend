@@ -27,6 +27,8 @@ type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
 
 const PasswordInputField: React.FC<InputFieldProps> = ({
   size: _,
+  showforgot,
+  touched,
   ...props
 }) => {
   const { isOpen, onToggle } = useDisclosure();
@@ -57,7 +59,7 @@ const PasswordInputField: React.FC<InputFieldProps> = ({
           fontWeight="semibold"
           fontSize="sm"
         >
-          {props.showforgot && (
+          {showforgot && (
             <Link href="/forgot-password" passHref>
               <UILink ml={"auto"} color="teal" mr={4}>
                 Forgot Password?
@@ -85,9 +87,7 @@ const PasswordInputField: React.FC<InputFieldProps> = ({
           required
         />
       </InputGroup>
-      {error && props.touched ? (
-        <FormErrorMessage>{error}</FormErrorMessage>
-      ) : null}
+      {error && touched ? <FormErrorMessage>{error}</FormErrorMessage> : null}
     </FormControl>
   );
 };
