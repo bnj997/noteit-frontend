@@ -30,7 +30,13 @@ const AuthForm: React.FC<AuthFormProps> = ({
       py="12"
       px={{ base: "4", lg: "8" }}
     >
-      <Heading textAlign="center" size="xl" fontWeight="extrabold" mb="16">
+      <Heading
+        textAlign="center"
+        size="xl"
+        fontWeight="extrabold"
+        mb="16"
+        color="teal"
+      >
         NoteIt
       </Heading>
       <Box maxW="md" mx="auto">
