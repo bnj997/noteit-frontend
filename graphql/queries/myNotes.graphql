@@ -1,0 +1,11 @@
+query MyNotes {
+  me {
+    id
+    notes {
+      id
+      title
+      description
+      category
+    }
+  }
+}
