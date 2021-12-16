@@ -7,31 +7,52 @@ import {
   Flex,
   Heading,
   Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Select,
+  Stack,
   Text,
   useColorModeValue,
+  useDisclosure,
 } from "@chakra-ui/react";
 import styled from "styled-components";
 import Note from "../components/Note";
 import { Note as NoteType, useMyNotesQuery } from "../generated/graphql";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useSort } from "../utils/useSort";
+import React from "react";
+import { FocusableElement } from "@chakra-ui/utils";
+import InputField from "../components/InputField";
+import { Formik, Form } from "formik";
 
 const Index: NextPage = () => {
   const { data, loading } = useMyNotesQuery();
-  const [initialNotes, setInitialNotes] = useState<NoteType[]>([]);
   const [filteredNotes, setFilteredNotes] = useState<NoteType[]>([]);
-
   const [filter, setFilter] = useState("");
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const [formState, setFormState] = useState<{
+    title: string;
+    description: string;
+    category: string;
+  }>({ title: "", description: "", category: "" });
+
+  const initialRef = useRef<FocusableElement>(null);
+  const finalRef = useRef<FocusableElement>(null);
 
   const { sortString, filterNotes } = useSort();
 
   useEffect(() => {
     if (!loading && data && data.me) {
-      setInitialNotes(data!.me!.notes);
-      setFilteredNotes([...initialNotes]);
+      setFilteredNotes([...data?.me.notes]);
     }
-  }, [loading, data, initialNotes]);
+  }, [loading, data]);
 
   const handleSeeMore = () => {
     setFilter("");
@@ -41,8 +62,17 @@ const Index: NextPage = () => {
 
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setFilter(e.target.value);
-    const newNotes = filterNotes(initialNotes, e.target.value);
+    const newNotes = filterNotes(data?.me?.notes, e.target.value);
     setFilteredNotes([...newNotes]);
+  };
+
+  const handleOpenModal = (noteInput: {
+    title: string;
+    description: string;
+    category: string;
+  }) => {
+    setFormState(noteInput);
+    onOpen();
   };
 
   return (
@@ -64,6 +94,65 @@ const Index: NextPage = () => {
       >
         Search or create your own notes
       </Heading>
+
+      <Modal
+        closeOnOverlayClick={false}
+        initialFocusRef={initialRef}
+        finalFocusRef={finalRef}
+        isOpen={isOpen}
+        size="xl"
+        onClose={onClose}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit your note</ModalHeader>
+          <ModalCloseButton />
+
+          <Formik
+            initialValues={formState}
+            onSubmit={async (values, { setErrors, resetForm }) => {}}
+          >
+            {({ isSubmitting, touched, isValid }) => (
+              <>
+                <ModalBody pb={6}>
+                  <Form>
+                    <Stack spacing="6">
+                      <InputField
+                        name="title"
+                        placeholder="title"
+                        label="Title"
+                        required
+                        touched={touched.title}
+                      />
+                      <InputField
+                        name="description"
+                        placeholder="description"
+                        label="Description"
+                        required
+                        touched={touched.description}
+                      />
+                    </Stack>
+                  </Form>
+                </ModalBody>
+                <ModalFooter>
+                  <Button
+                    mt={4}
+                    size="lg"
+                    fontSize="md"
+                    isDisabled={!isValid}
+                    isLoading={isSubmitting}
+                    colorScheme="teal"
+                    type="submit"
+                  >
+                    Submit Changes
+                  </Button>
+                </ModalFooter>
+              </>
+            )}
+          </Formik>
+        </ModalContent>
+      </Modal>
+
       <Flex justifyContent="center" alignItems="center" flexWrap="wrap">
         <Flex justifyContent="center" alignItems="center" m="2">
           <Text mr="2"> Manual: </Text>
@@ -102,6 +191,7 @@ const Index: NextPage = () => {
                 title={note?.title}
                 category={note?.category}
                 description={note?.description}
+                onModalOpen={handleOpenModal}
               />
             );
           })}
@@ -121,7 +211,7 @@ const Index: NextPage = () => {
   );
 };
 
-export default withApollo({ ssr: true })(Index);
+export default withApollo({ ssr: false })(Index);
 
 const NotesGrid = styled.div`
   margin-top: 2rem;

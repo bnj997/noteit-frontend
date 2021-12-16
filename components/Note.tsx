@@ -13,9 +13,27 @@ interface NoteProps {
   title: string;
   category: string;
   description: string;
+  onModalOpen: ({
+    title,
+    description,
+    category,
+  }: {
+    title: string;
+    description: string;
+    category: string;
+  }) => void;
 }
 
-const Note: React.FC<NoteProps> = ({ title, category, description }) => {
+const Note: React.FC<NoteProps> = ({
+  title,
+  category,
+  description,
+  onModalOpen,
+}) => {
+  const handleModalOpen = () => {
+    onModalOpen({ title, description, category });
+  };
+
   return (
     <NoteCard>
       <Flex alignItems={"center"} p={3}>
@@ -27,7 +45,7 @@ const Note: React.FC<NoteProps> = ({ title, category, description }) => {
       <Text p={3}>{description}</Text>
       <Flex alignItems={"center"} p={3}>
         <ButtonGroup spacing="6" width="100%">
-          <Button colorScheme="teal" width="100%">
+          <Button colorScheme="teal" width="100%" onClick={handleModalOpen}>
             Edit
           </Button>
           <Button width="100%">Delete</Button>
