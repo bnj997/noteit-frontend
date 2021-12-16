@@ -3,23 +3,20 @@ import {
   FormErrorMessage,
   FormLabel,
 } from "@chakra-ui/form-control";
-import { Input } from "@chakra-ui/input";
-import { FocusableElement } from "@chakra-ui/utils";
-import { useField } from "formik";
-import React, { InputHTMLAttributes } from "react";
+import { Textarea } from "@chakra-ui/textarea";
 
-type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
+import { useField } from "formik";
+import React, { TextareaHTMLAttributes } from "react";
+
+type TextareaFieldProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   label: string;
   name: string;
-  refFocus?: React.LegacyRef<HTMLInputElement> | undefined;
   touched: boolean | undefined;
 };
 
-const InputField: React.FC<InputFieldProps> = ({
+const TextareaField: React.FC<TextareaFieldProps> = ({
   label,
-  size: _,
   touched,
-  refFocus,
   ...props
 }) => {
   const [field, { error }] = useField(props);
@@ -29,8 +26,7 @@ const InputField: React.FC<InputFieldProps> = ({
       <FormLabel id={field.name} htmlFor={field.name}>
         {label}
       </FormLabel>
-      <Input
-        ref={refFocus}
+      <Textarea
         {...field}
         {...props}
         id={field.name}
@@ -41,4 +37,4 @@ const InputField: React.FC<InputFieldProps> = ({
   );
 };
 
-export default InputField;
+export default TextareaField;

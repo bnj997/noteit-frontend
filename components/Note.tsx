@@ -8,14 +8,43 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import styled from "styled-components";
+import { FocusableElement } from "@chakra-ui/utils";
 
 interface NoteProps {
+  id: string;
   title: string;
   category: string;
   description: string;
+  onModalOpen: ({
+    id,
+    title,
+    description,
+    category,
+  }: {
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+  }) => void;
+  onDeleteModalOpen: (id: string) => void;
 }
 
-const Note: React.FC<NoteProps> = ({ title, category, description }) => {
+const Note: React.FC<NoteProps> = ({
+  id,
+  title,
+  category,
+  description,
+  onModalOpen,
+  onDeleteModalOpen,
+}) => {
+  const handleModalOpen = () => {
+    onModalOpen({ id, title, description, category });
+  };
+
+  const handleDeleteModal = () => {
+    onDeleteModalOpen(id);
+  };
+
   return (
     <NoteCard>
       <Flex alignItems={"center"} p={3}>
@@ -27,10 +56,12 @@ const Note: React.FC<NoteProps> = ({ title, category, description }) => {
       <Text p={3}>{description}</Text>
       <Flex alignItems={"center"} p={3}>
         <ButtonGroup spacing="6" width="100%">
-          <Button colorScheme="teal" width="100%">
+          <Button colorScheme="teal" width="100%" onClick={handleModalOpen}>
             Edit
           </Button>
-          <Button width="100%">Delete</Button>
+          <Button width="100%" onClick={handleDeleteModal}>
+            Delete
+          </Button>
         </ButtonGroup>
       </Flex>
     </NoteCard>
@@ -42,7 +73,7 @@ export default Note;
 const NoteCard = styled.div`
   display: flex;
   flex-direction: column;
-  height: 275px;
+  height: 350px;
   justify-content: space-between;
   padding: 1rem;
   border-radius: 10px;
