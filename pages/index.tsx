@@ -30,8 +30,6 @@ import {
   useMyNotesQuery,
   useDeleteNoteMutation,
   useUpdateNoteMutation,
-  DeleteNoteMutation,
-  DeleteNoteDocument,
 } from "../generated/graphql";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useSort } from "../utils/useSort";
@@ -56,8 +54,6 @@ const Index: NextPage = () => {
   const [deleteNote] = useDeleteNoteMutation();
   const [filteredNotes, setFilteredNotes] = useState<NoteType[]>([]);
   const [filter, setFilter] = useState("");
-
-  const client = useApolloClient();
 
   const [formState, setFormState] = useState<{
     id: string;
@@ -123,15 +119,8 @@ const Index: NextPage = () => {
   const handleConfirmDelete = async () => {
     await deleteNote({
       variables: { id: deleteNoteId },
-      update: (cache, { data }) => {
-        cache.writeQuery<DeleteNoteMutation>({
-          query: DeleteNoteDocument,
-          data: {
-            __typename: "Mutation",
-            deleteNote: data!.deleteNote,
-          },
-        });
-        cache.evict({ fieldName: "notes:{}" });
+      update: (cache) => {
+        cache.evict({ id: "Note:" + deleteNoteId });
       },
     });
     onDeleteClose();
