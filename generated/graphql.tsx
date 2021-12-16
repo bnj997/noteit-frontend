@@ -25,12 +25,12 @@ export type Mutation = {
   __typename?: 'Mutation';
   changePassword: UserResponse;
   createNote: Note;
-  deleteNote: Note;
+  deleteNote: Scalars['Boolean'];
   forgotPassword: Scalars['Boolean'];
   login: UserResponse;
   logout: Scalars['Boolean'];
   register: UserResponse;
-  updateNote: Note;
+  updateNote: NoteResponse;
 };
 
 
@@ -87,6 +87,12 @@ export type Note = {
   title: Scalars['String'];
 };
 
+export type NoteResponse = {
+  __typename?: 'NoteResponse';
+  errors?: Maybe<Array<Maybe<FieldError>>>;
+  note?: Maybe<Note>;
+};
+
 export type Query = {
   __typename?: 'Query';
   me?: Maybe<User>;
@@ -114,6 +120,13 @@ export type ChangePasswordMutationVariables = Exact<{
 
 
 export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', message: string, field: string } | null | undefined> | null | undefined, user?: { __typename?: 'User', id: string, username: string } | null | undefined } };
+
+export type DeleteNoteMutationVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type DeleteNoteMutation = { __typename?: 'Mutation', deleteNote: boolean };
 
 export type ForgotPasswordMutationVariables = Exact<{
   email: Scalars['String'];
@@ -143,6 +156,16 @@ export type RegisterMutationVariables = Exact<{
 
 
 export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string } | null | undefined> | null | undefined, user?: { __typename?: 'User', id: string, username: string } | null | undefined } };
+
+export type UpdateNoteMutationVariables = Exact<{
+  id: Scalars['String'];
+  title: Scalars['String'];
+  description: Scalars['String'];
+  category: Scalars['String'];
+}>;
+
+
+export type UpdateNoteMutation = { __typename?: 'Mutation', updateNote: { __typename?: 'NoteResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string } | null | undefined> | null | undefined, note?: { __typename?: 'Note', id: string, title: string, description: string, category: string, creatorId: string } | null | undefined } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -196,6 +219,37 @@ export function useChangePasswordMutation(baseOptions?: Apollo.MutationHookOptio
 export type ChangePasswordMutationHookResult = ReturnType<typeof useChangePasswordMutation>;
 export type ChangePasswordMutationResult = Apollo.MutationResult<ChangePasswordMutation>;
 export type ChangePasswordMutationOptions = Apollo.BaseMutationOptions<ChangePasswordMutation, ChangePasswordMutationVariables>;
+export const DeleteNoteDocument = gql`
+    mutation DeleteNote($id: String!) {
+  deleteNote(id: $id)
+}
+    `;
+export type DeleteNoteMutationFn = Apollo.MutationFunction<DeleteNoteMutation, DeleteNoteMutationVariables>;
+
+/**
+ * __useDeleteNoteMutation__
+ *
+ * To run a mutation, you first call `useDeleteNoteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteNoteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteNoteMutation, { data, loading, error }] = useDeleteNoteMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteNoteMutation(baseOptions?: Apollo.MutationHookOptions<DeleteNoteMutation, DeleteNoteMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteNoteMutation, DeleteNoteMutationVariables>(DeleteNoteDocument, options);
+      }
+export type DeleteNoteMutationHookResult = ReturnType<typeof useDeleteNoteMutation>;
+export type DeleteNoteMutationResult = Apollo.MutationResult<DeleteNoteMutation>;
+export type DeleteNoteMutationOptions = Apollo.BaseMutationOptions<DeleteNoteMutation, DeleteNoteMutationVariables>;
 export const ForgotPasswordDocument = gql`
     mutation ForgotPassword($email: String!) {
   forgotPassword(email: $email)
@@ -340,6 +394,57 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const UpdateNoteDocument = gql`
+    mutation UpdateNote($id: String!, $title: String!, $description: String!, $category: String!) {
+  updateNote(
+    id: $id
+    title: $title
+    description: $description
+    category: $category
+  ) {
+    errors {
+      field
+      message
+    }
+    note {
+      id
+      title
+      description
+      category
+      creatorId
+    }
+  }
+}
+    `;
+export type UpdateNoteMutationFn = Apollo.MutationFunction<UpdateNoteMutation, UpdateNoteMutationVariables>;
+
+/**
+ * __useUpdateNoteMutation__
+ *
+ * To run a mutation, you first call `useUpdateNoteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateNoteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateNoteMutation, { data, loading, error }] = useUpdateNoteMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      title: // value for 'title'
+ *      description: // value for 'description'
+ *      category: // value for 'category'
+ *   },
+ * });
+ */
+export function useUpdateNoteMutation(baseOptions?: Apollo.MutationHookOptions<UpdateNoteMutation, UpdateNoteMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateNoteMutation, UpdateNoteMutationVariables>(UpdateNoteDocument, options);
+      }
+export type UpdateNoteMutationHookResult = ReturnType<typeof useUpdateNoteMutation>;
+export type UpdateNoteMutationResult = Apollo.MutationResult<UpdateNoteMutation>;
+export type UpdateNoteMutationOptions = Apollo.BaseMutationOptions<UpdateNoteMutation, UpdateNoteMutationVariables>;
 export const MeDocument = gql`
     query Me {
   me {

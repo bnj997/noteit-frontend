@@ -1,0 +1,25 @@
+mutation UpdateNote(
+  $id: String!
+  $title: String!
+  $description: String!
+  $category: String!
+) {
+  updateNote(
+    id: $id
+    title: $title
+    description: $description
+    category: $category
+  ) {
+    errors {
+      field
+      message
+    }
+    note {
+      id
+      title
+      description
+      category
+      creatorId
+    }
+  }
+}

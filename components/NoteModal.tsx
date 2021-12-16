@@ -11,14 +11,30 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { Formik, Form } from "formik";
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import InputField from "./InputField";
 import { FocusableElement } from "@chakra-ui/utils";
 
-interface NoteModalProps {}
+interface NoteModalProps {
+  heading: string;
+  initialState: {
+    title: string;
+    description: string;
+    category: string;
+  };
+  isModalOpen: boolean;
+}
 
-const NoteModal: React.FC<NoteModalProps> = ({}) => {
+const NoteModal: React.FC<NoteModalProps> = ({
+  heading,
+  initialState,
+  isModalOpen,
+}) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  useEffect(() => {
+    isModalOpen ? onOpen() : onClose();
+  }, [isModalOpen]);
 
   const initialRef = useRef<FocusableElement>(null);
   const finalRef = useRef<FocusableElement>(null);
@@ -34,11 +50,11 @@ const NoteModal: React.FC<NoteModalProps> = ({}) => {
     >
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Edit your note</ModalHeader>
+        <ModalHeader>{heading}</ModalHeader>
         <ModalCloseButton />
 
         <Formik
-          initialValues={formState}
+          initialValues={initialState}
           onSubmit={async (values, { setErrors, resetForm }) => {}}
         >
           {({ isSubmitting, touched, isValid }) => (

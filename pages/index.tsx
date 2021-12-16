@@ -4,6 +4,7 @@ import NavBar from "../components/NavBar";
 import {
   Box,
   Button,
+  ButtonGroup,
   Flex,
   Heading,
   Input,
@@ -22,26 +23,58 @@ import {
 } from "@chakra-ui/react";
 import styled from "styled-components";
 import Note from "../components/Note";
-import { Note as NoteType, useMyNotesQuery } from "../generated/graphql";
+import {
+  Note as NoteType,
+  UpdateNoteDocument,
+  UpdateNoteMutation,
+  useMyNotesQuery,
+  useDeleteNoteMutation,
+  useUpdateNoteMutation,
+} from "../generated/graphql";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useSort } from "../utils/useSort";
 import React from "react";
 import { FocusableElement } from "@chakra-ui/utils";
+import * as Yup from "yup";
 import InputField from "../components/InputField";
 import { Formik, Form } from "formik";
+import { toErrorMap } from "../utils/toErrorMap";
+import TextareaField from "../components/TextareaField";
+
+const CreateNoteSchema = Yup.object().shape({
+  title: Yup.string().required("Please enter a title"),
+  description: Yup.string().required("Please enter a description"),
+  category: Yup.string().required("Please enter a category"),
+});
 
 const Index: NextPage = () => {
   const { data, loading } = useMyNotesQuery();
+  const [updateNote] = useUpdateNoteMutation();
+  const [deleteNote] = useDeleteNoteMutation();
   const [filteredNotes, setFilteredNotes] = useState<NoteType[]>([]);
   const [filter, setFilter] = useState("");
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
   const [formState, setFormState] = useState<{
+    id: string;
     title: string;
     description: string;
     category: string;
-  }>({ title: "", description: "", category: "" });
+  }>({ id: "", title: "", description: "", category: "" });
+
+  const [deleteNoteId, setDeleteNoteId] = useState<string>("");
+
+  /* EDIT NOTE MODAL */
+  const {
+    isOpen: isEditOpen,
+    onOpen: onEditOpen,
+    onClose: onEditClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose,
+  } = useDisclosure();
 
   const initialRef = useRef<FocusableElement>(null);
   const finalRef = useRef<FocusableElement>(null);
@@ -67,12 +100,19 @@ const Index: NextPage = () => {
   };
 
   const handleOpenModal = (noteInput: {
+    id: string;
     title: string;
     description: string;
     category: string;
+    deleteMode?: boolean;
   }) => {
     setFormState(noteInput);
-    onOpen();
+    onEditOpen();
+  };
+
+  const handleDeleteModalOpen = (id: string) => {
+    setDeleteNoteId(id);
+    onDeleteOpen();
   };
 
   return (
@@ -95,66 +135,158 @@ const Index: NextPage = () => {
         Search or create your own notes
       </Heading>
 
+      {/* EDIT MODAL*/}
       <Modal
         closeOnOverlayClick={false}
         initialFocusRef={initialRef}
         finalFocusRef={finalRef}
-        isOpen={isOpen}
+        isOpen={isEditOpen}
         size="xl"
-        onClose={onClose}
+        isCentered
+        onClose={onEditClose}
       >
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Edit your note</ModalHeader>
+          <ModalHeader>
+            <Heading size="lg">Edit your note</Heading>
+          </ModalHeader>
           <ModalCloseButton />
 
           <Formik
             initialValues={formState}
-            onSubmit={async (values, { setErrors, resetForm }) => {}}
+            validationSchema={CreateNoteSchema}
+            onSubmit={async (values, { setErrors, resetForm }) => {
+              const response = await updateNote({
+                variables: values,
+                update: (cache, { data }) => {
+                  cache.writeQuery<UpdateNoteMutation>({
+                    query: UpdateNoteDocument,
+                    data: {
+                      __typename: "Mutation",
+                      updateNote: data!.updateNote,
+                    },
+                  });
+                },
+              });
+              if (response.data?.updateNote.errors) {
+                setErrors(toErrorMap(response.data.updateNote.errors));
+              } else if (response.data?.updateNote.note) {
+                resetForm();
+                onEditClose();
+              }
+            }}
           >
             {({ isSubmitting, touched, isValid }) => (
-              <>
+              <Form>
                 <ModalBody pb={6}>
-                  <Form>
-                    <Stack spacing="6">
-                      <InputField
-                        name="title"
-                        placeholder="title"
-                        label="Title"
-                        required
-                        touched={touched.title}
-                      />
-                      <InputField
-                        name="description"
-                        placeholder="description"
-                        label="Description"
-                        required
-                        touched={touched.description}
-                      />
-                    </Stack>
-                  </Form>
+                  <Stack spacing="6">
+                    <InputField
+                      refFocus={initialRef}
+                      name="title"
+                      placeholder="title"
+                      label="Title"
+                      required
+                      touched={touched.title}
+                    />
+                    <TextareaField
+                      name="description"
+                      placeholder="description"
+                      label="Description"
+                      rows={10}
+                      required
+                      touched={touched.description}
+                    />
+                    <InputField
+                      name="category"
+                      placeholder="category"
+                      label="Category"
+                      required
+                      touched={touched.category}
+                    />
+                  </Stack>
                 </ModalBody>
                 <ModalFooter>
-                  <Button
-                    mt={4}
-                    size="lg"
-                    fontSize="md"
-                    isDisabled={!isValid}
-                    isLoading={isSubmitting}
-                    colorScheme="teal"
-                    type="submit"
-                  >
-                    Submit Changes
-                  </Button>
+                  <ButtonGroup spacing="6">
+                    <Button
+                      mt={4}
+                      size="lg"
+                      fontSize="md"
+                      isDisabled={!isValid}
+                      isLoading={isSubmitting}
+                      colorScheme="teal"
+                      type="submit"
+                    >
+                      Submit Changes
+                    </Button>
+                    <Button
+                      mt={4}
+                      size="lg"
+                      fontSize="md"
+                      isDisabled={!isValid}
+                      isLoading={isSubmitting}
+                      onClick={() => onEditClose()}
+                    >
+                      Cancel
+                    </Button>
+                  </ButtonGroup>
                 </ModalFooter>
-              </>
+              </Form>
             )}
           </Formik>
         </ModalContent>
       </Modal>
 
-      <Flex justifyContent="center" alignItems="center" flexWrap="wrap">
-        <Flex justifyContent="center" alignItems="center" m="2">
+      {/* CONFIRM DELETE MODAL*/}
+      <Modal
+        closeOnOverlayClick={false}
+        initialFocusRef={initialRef}
+        finalFocusRef={finalRef}
+        isOpen={isDeleteOpen}
+        size="xl"
+        isCentered
+        onClose={onDeleteClose}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>
+            <Heading size="lg">Are you sure?</Heading>
+          </ModalHeader>
+          <ModalCloseButton />
+
+          <ModalBody pb={6}>
+            <Text>
+              Are you sure you want to delete this note? It will be gone
+              forever.
+            </Text>
+          </ModalBody>
+          <ModalFooter>
+            <ButtonGroup spacing="6">
+              <Button
+                mt={4}
+                size="lg"
+                fontSize="md"
+                isLoading={isSubmitting}
+                colorScheme="teal"
+                type="submit"
+              >
+                Confirm Delete
+              </Button>
+              <Button
+                mt={4}
+                size="lg"
+                fontSize="md"
+                isLoading={isSubmitting}
+                onClick={() => onDeleteClose()}
+              >
+                Cancel
+              </Button>
+            </ButtonGroup>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <SearchGrid>
+        <Flex justifyContent="center" alignItems="center">
           <Text mr="2"> Manual: </Text>
           <Input
             w="300px"
@@ -167,7 +299,7 @@ const Index: NextPage = () => {
             my="10"
           />
         </Flex>
-        <Flex justifyContent="center" alignItems="center" m="2">
+        <Flex justifyContent="center" alignItems="center">
           <Text mr="2"> Category: </Text>
           <Select
             w="300px"
@@ -175,12 +307,25 @@ const Index: NextPage = () => {
             onChange={(e) =>
               setFilteredNotes([...sortString(filteredNotes, e.target.value)])
             }
+            my="5"
           >
             <option value="name">Name</option>
             <option value="category">Category</option>
           </Select>
         </Flex>
-      </Flex>
+
+        <ButtonGroup
+          spacing="6"
+          width="100%"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Button colorScheme="teal" onClick={handleSeeMore}>
+            Create Note
+          </Button>
+          <Button onClick={handleSeeMore}>Create Category</Button>
+        </ButtonGroup>
+      </SearchGrid>
 
       {filteredNotes.length > 0 ? (
         <NotesGrid>
@@ -188,10 +333,12 @@ const Index: NextPage = () => {
             return (
               <Note
                 key={note?.id}
+                id={note?.id}
                 title={note?.title}
                 category={note?.category}
                 description={note?.description}
                 onModalOpen={handleOpenModal}
+                onDeleteModalOpen={handleDeleteModalOpen}
               />
             );
           })}
@@ -224,7 +371,7 @@ const NotesGrid = styled.div`
 `;
 
 const SearchGrid = styled.div`
-  margin-top: 2rem;
+  width: 70vw;
   margin-left: auto;
   margin-right: auto;
   display: grid;
