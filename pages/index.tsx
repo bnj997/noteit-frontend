@@ -40,7 +40,7 @@ import InputField from "../components/InputField";
 import { Formik, Form } from "formik";
 import { toErrorMap } from "../utils/toErrorMap";
 import TextareaField from "../components/TextareaField";
-import { useApolloClient } from "@apollo/client";
+import ConfirmDeleteModal from "../components/modals/ConfirmDeleteModal";
 
 const CreateNoteSchema = Yup.object().shape({
   title: Yup.string().required("Please enter a title"),
@@ -71,11 +71,14 @@ const Index: NextPage = () => {
     onClose: onEditClose,
   } = useDisclosure();
 
-  const {
-    isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose,
-  } = useDisclosure();
+  // const {
+  //   isOpen: isDeleteOpen,
+  //   onOpen: onDeleteOpen,
+  //   onClose: onDeleteClose,
+  // } = useDisclosure();
+
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] =
+    useState<boolean>(false);
 
   const initialRef = useRef<FocusableElement>(null);
   const finalRef = useRef<FocusableElement>(null);
@@ -113,7 +116,8 @@ const Index: NextPage = () => {
 
   const handleDeleteModalOpen = (id: string) => {
     setDeleteNoteId(id);
-    onDeleteOpen();
+    setIsConfirmDeleteOpen(true);
+    // onDeleteOpen();
   };
 
   const handleConfirmDelete = async () => {
@@ -248,7 +252,7 @@ const Index: NextPage = () => {
       </Modal>
 
       {/* CONFIRM DELETE MODAL*/}
-      <Modal
+      {/* <Modal
         closeOnOverlayClick={false}
         initialFocusRef={initialRef}
         finalFocusRef={finalRef}
@@ -287,7 +291,12 @@ const Index: NextPage = () => {
             </ButtonGroup>
           </ModalFooter>
         </ModalContent>
-      </Modal>
+      </Modal> */}
+
+      <ConfirmDeleteModal
+        noteId={deleteNoteId}
+        isModalOpen={isConfirmDeleteOpen}
+      />
 
       <SearchGrid>
         <Flex justifyContent="center" alignItems="center">

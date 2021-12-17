@@ -12,10 +12,10 @@ import {
 } from "@chakra-ui/react";
 import { Formik, Form } from "formik";
 import React, { useEffect, useRef, useState } from "react";
-import InputField from "./InputField";
+import InputField from "../InputField";
 import { FocusableElement } from "@chakra-ui/utils";
 
-interface NoteModalProps {
+interface EditAddNoteModalProps {
   heading: string;
   initialState: {
     title: string;
@@ -25,16 +25,12 @@ interface NoteModalProps {
   isModalOpen: boolean;
 }
 
-const NoteModal: React.FC<NoteModalProps> = ({
+const EditAddNoteModal: React.FC<EditAddNoteModalProps> = ({
   heading,
   initialState,
   isModalOpen,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  useEffect(() => {
-    isModalOpen ? onOpen() : onClose();
-  }, [isModalOpen]);
 
   const initialRef = useRef<FocusableElement>(null);
   const finalRef = useRef<FocusableElement>(null);
@@ -44,7 +40,7 @@ const NoteModal: React.FC<NoteModalProps> = ({
       closeOnOverlayClick={false}
       initialFocusRef={initialRef}
       finalFocusRef={finalRef}
-      isOpen={isOpen}
+      isOpen={isModalOpen}
       size="xl"
       onClose={onClose}
     >
@@ -100,4 +96,4 @@ const NoteModal: React.FC<NoteModalProps> = ({
   );
 };
 
-export default NoteModal;
+export default EditAddNoteModal;
