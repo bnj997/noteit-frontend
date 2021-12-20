@@ -8,15 +8,7 @@ import {
   Flex,
   Heading,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
-  Stack,
   Text,
   useColorModeValue,
   useDisclosure,
@@ -25,46 +17,29 @@ import styled from "styled-components";
 import Note from "../components/Note";
 import {
   Note as NoteType,
-  UpdateNoteDocument,
-  UpdateNoteMutation,
   useMyNotesQuery,
   useDeleteNoteMutation,
-  useUpdateNoteMutation,
 } from "../generated/graphql";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useSort } from "../utils/useSort";
 import React from "react";
-import { FocusableElement } from "@chakra-ui/utils";
-import * as Yup from "yup";
-import InputField from "../components/InputField";
-import { Formik, Form } from "formik";
-import { toErrorMap } from "../utils/toErrorMap";
-import TextareaField from "../components/TextareaField";
-import { useApolloClient } from "@apollo/client";
-
-const CreateNoteSchema = Yup.object().shape({
-  title: Yup.string().required("Please enter a title"),
-  description: Yup.string().required("Please enter a description"),
-  category: Yup.string().required("Please enter a category"),
-});
+import { useRouter } from "next/router";
+import ConfirmDeleteModal from "../components/modals/ConfirmDeleteModal";
+import AddNoteModal from "../components/modals/notes/AddNoteModal";
+import EditNoteModal from "../components/modals/notes/EditNoteModal";
 
 const Index: NextPage = () => {
   const { data, loading } = useMyNotesQuery();
-  const [updateNote] = useUpdateNoteMutation();
+  const router = useRouter();
+  useEffect(() => {
+    if (!loading && !data?.me) {
+      router.push("/login");
+    }
+  }, [loading, data, router]);
+
   const [deleteNote] = useDeleteNoteMutation();
-  const [filteredNotes, setFilteredNotes] = useState<NoteType[]>([]);
-  const [filter, setFilter] = useState("");
+  const [noteId, setNoteId] = useState<string>("");
 
-  const [formState, setFormState] = useState<{
-    id: string;
-    title: string;
-    description: string;
-    category: string;
-  }>({ id: "", title: "", description: "", category: "" });
-
-  const [deleteNoteId, setDeleteNoteId] = useState<string>("");
-
-  /* EDIT NOTE MODAL */
   const {
     isOpen: isEditOpen,
     onOpen: onEditOpen,
@@ -72,14 +47,21 @@ const Index: NextPage = () => {
   } = useDisclosure();
 
   const {
-    isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose,
+    isOpen: isAddOpen,
+    onOpen: onAddOpen,
+    onClose: onAddClose,
   } = useDisclosure();
 
-  const initialRef = useRef<FocusableElement>(null);
-  const finalRef = useRef<FocusableElement>(null);
+  const {
+    isOpen: isConfirmDeleteOpen,
+    onOpen: onConfirmDeleteOpen,
+    onClose: onConfirmDeleteClose,
+  } = useDisclosure();
 
+  /* SEARCH STUFF */
+
+  const [filteredNotes, setFilteredNotes] = useState<NoteType[]>([]);
+  const [filter, setFilter] = useState("");
   const { sortString, filterNotes } = useSort();
 
   useEffect(() => {
@@ -98,32 +80,6 @@ const Index: NextPage = () => {
     setFilter(e.target.value);
     const newNotes = filterNotes(data?.me?.notes, e.target.value);
     setFilteredNotes([...newNotes]);
-  };
-
-  const handleOpenModal = (noteInput: {
-    id: string;
-    title: string;
-    description: string;
-    category: string;
-    deleteMode?: boolean;
-  }) => {
-    setFormState(noteInput);
-    onEditOpen();
-  };
-
-  const handleDeleteModalOpen = (id: string) => {
-    setDeleteNoteId(id);
-    onDeleteOpen();
-  };
-
-  const handleConfirmDelete = async () => {
-    await deleteNote({
-      variables: { id: deleteNoteId },
-      update: (cache) => {
-        cache.evict({ id: "Note:" + deleteNoteId });
-      },
-    });
-    onDeleteClose();
   };
 
   return (
@@ -146,148 +102,35 @@ const Index: NextPage = () => {
         Search or create your own notes
       </Heading>
 
-      {/* EDIT MODAL*/}
-      <Modal
-        closeOnOverlayClick={false}
-        initialFocusRef={initialRef}
-        finalFocusRef={finalRef}
+      <EditNoteModal
+        noteId={noteId}
         isOpen={isEditOpen}
-        size="xl"
-        isCentered
         onClose={onEditClose}
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>
-            <Heading size="lg">Edit your note</Heading>
-          </ModalHeader>
-          <ModalCloseButton />
+      />
 
-          <Formik
-            initialValues={formState}
-            validationSchema={CreateNoteSchema}
-            onSubmit={async (values, { setErrors, resetForm }) => {
-              const response = await updateNote({
-                variables: values,
-                update: (cache, { data }) => {
-                  cache.writeQuery<UpdateNoteMutation>({
-                    query: UpdateNoteDocument,
-                    data: {
-                      __typename: "Mutation",
-                      updateNote: data!.updateNote,
-                    },
-                  });
-                },
-              });
-              if (response.data?.updateNote.errors) {
-                setErrors(toErrorMap(response.data.updateNote.errors));
-              } else if (response.data?.updateNote.note) {
-                resetForm();
-                onEditClose();
-              }
-            }}
-          >
-            {({ isSubmitting, touched, isValid }) => (
-              <Form>
-                <ModalBody pb={6}>
-                  <Stack spacing="6">
-                    <InputField
-                      refFocus={initialRef}
-                      name="title"
-                      placeholder="title"
-                      label="Title"
-                      required
-                      touched={touched.title}
-                    />
-                    <TextareaField
-                      name="description"
-                      placeholder="description"
-                      label="Description"
-                      rows={10}
-                      required
-                      touched={touched.description}
-                    />
-                    <InputField
-                      name="category"
-                      placeholder="category"
-                      label="Category"
-                      required
-                      touched={touched.category}
-                    />
-                  </Stack>
-                </ModalBody>
-                <ModalFooter>
-                  <ButtonGroup spacing="6">
-                    <Button
-                      mt={4}
-                      size="lg"
-                      fontSize="md"
-                      isDisabled={!isValid}
-                      isLoading={isSubmitting}
-                      colorScheme="teal"
-                      type="submit"
-                    >
-                      Submit Changes
-                    </Button>
-                    <Button
-                      mt={4}
-                      size="lg"
-                      fontSize="md"
-                      isDisabled={!isValid}
-                      isLoading={isSubmitting}
-                      onClick={() => onEditClose()}
-                    >
-                      Cancel
-                    </Button>
-                  </ButtonGroup>
-                </ModalFooter>
-              </Form>
-            )}
-          </Formik>
-        </ModalContent>
-      </Modal>
+      <AddNoteModal
+        userId={data?.me?.id}
+        isOpen={isAddOpen}
+        onClose={onAddClose}
+      />
 
-      {/* CONFIRM DELETE MODAL*/}
-      <Modal
-        closeOnOverlayClick={false}
-        initialFocusRef={initialRef}
-        finalFocusRef={finalRef}
-        isOpen={isDeleteOpen}
-        size="xl"
-        isCentered
-        onClose={onDeleteClose}
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>
-            <Heading size="lg">Are you sure?</Heading>
-          </ModalHeader>
-          <ModalCloseButton />
+      <ConfirmDeleteModal
+        isOpen={isConfirmDeleteOpen}
+        onClose={onConfirmDeleteClose}
+        item="note"
+        onConfirm={async () => {
+          await deleteNote({
+            variables: { id: noteId },
+            update: (cache) => {
+              cache.evict({ id: "Note:" + noteId });
+              cache.evict({ id: "User:" + data?.me?.id, fieldName: "notes" });
+              cache.gc();
+            },
+          });
 
-          <ModalBody pb={6}>
-            <Text>
-              Are you sure you want to delete this note? It will be gone
-              forever.
-            </Text>
-          </ModalBody>
-          <ModalFooter>
-            <ButtonGroup spacing="6">
-              <Button
-                mt={4}
-                size="lg"
-                fontSize="md"
-                colorScheme="teal"
-                onClick={handleConfirmDelete}
-              >
-                Confirm Delete
-              </Button>
-              <Button mt={4} size="lg" fontSize="md" onClick={onDeleteClose}>
-                Cancel
-              </Button>
-            </ButtonGroup>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+          onConfirmDeleteClose();
+        }}
+      />
 
       <SearchGrid>
         <Flex justifyContent="center" alignItems="center">
@@ -324,7 +167,12 @@ const Index: NextPage = () => {
           justifyContent="center"
           alignItems="center"
         >
-          <Button colorScheme="teal" onClick={handleSeeMore}>
+          <Button
+            colorScheme="teal"
+            onClick={() => {
+              onAddOpen();
+            }}
+          >
             Create Note
           </Button>
           <Button onClick={handleSeeMore}>Create Category</Button>
@@ -341,8 +189,14 @@ const Index: NextPage = () => {
                 title={note?.title}
                 category={note?.category}
                 description={note?.description}
-                onModalOpen={handleOpenModal}
-                onDeleteModalOpen={handleDeleteModalOpen}
+                onEditModalOpen={(id: string) => {
+                  setNoteId(id);
+                  onEditOpen();
+                }}
+                onDeleteModalOpen={(id: string) => {
+                  setNoteId(id);
+                  onConfirmDeleteOpen();
+                }}
               />
             );
           })}
@@ -362,7 +216,7 @@ const Index: NextPage = () => {
   );
 };
 
-export default withApollo({ ssr: false })(Index);
+export default withApollo({ ssr: true })(Index);
 
 const NotesGrid = styled.div`
   margin-top: 2rem;
