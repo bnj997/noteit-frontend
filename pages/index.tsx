@@ -108,11 +108,7 @@ const Index: NextPage = () => {
         onClose={onEditClose}
       />
 
-      <AddNoteModal
-        userId={data?.me?.id}
-        isOpen={isAddOpen}
-        onClose={onAddClose}
-      />
+      <AddNoteModal isOpen={isAddOpen} onClose={onAddClose} />
 
       <ConfirmDeleteModal
         isOpen={isConfirmDeleteOpen}
