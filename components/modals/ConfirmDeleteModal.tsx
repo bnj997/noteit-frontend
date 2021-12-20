@@ -7,41 +7,26 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-  useDisclosure,
   Text,
   Heading,
   ButtonGroup,
 } from "@chakra-ui/react";
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { FocusableElement } from "@chakra-ui/utils";
-import { useDeleteNoteMutation } from "../../generated/graphql";
 
 interface ConfirmDeleteModalProps {
-  noteId: string;
-  isModalOpen: boolean;
+  item: string;
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
 }
 
 const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
-  noteId,
-  isModalOpen,
+  isOpen,
+  onClose,
+  onConfirm,
+  item,
 }) => {
-  const [deleteNote] = useDeleteNoteMutation();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
-  useEffect(() => {
-    isModalOpen ? onOpen() : onClose();
-  }, [isModalOpen, onOpen, onClose]);
-
-  const handleConfirmDelete = async () => {
-    await deleteNote({
-      variables: { id: noteId },
-      update: (cache) => {
-        cache.evict({ id: "Note:" + noteId });
-      },
-    });
-    onClose();
-  };
-
   const initialRef = useRef<FocusableElement>(null);
   const finalRef = useRef<FocusableElement>(null);
 
@@ -64,7 +49,8 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
 
         <ModalBody pb={6}>
           <Text>
-            Are you sure you want to delete this note? It will be gone forever.
+            Are you sure you want to delete this {item}? It will be gone
+            forever.
           </Text>
         </ModalBody>
         <ModalFooter>
@@ -74,7 +60,7 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
               size="lg"
               fontSize="md"
               colorScheme="teal"
-              onClick={handleConfirmDelete}
+              onClick={onConfirm}
             >
               Confirm Delete
             </Button>

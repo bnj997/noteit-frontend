@@ -8,24 +8,13 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import styled from "styled-components";
-import { FocusableElement } from "@chakra-ui/utils";
 
 interface NoteProps {
   id: string;
   title: string;
   category: string;
   description: string;
-  onModalOpen: ({
-    id,
-    title,
-    description,
-    category,
-  }: {
-    id: string;
-    title: string;
-    description: string;
-    category: string;
-  }) => void;
+  onEditModalOpen: (id: string) => void;
   onDeleteModalOpen: (id: string) => void;
 }
 
@@ -34,17 +23,9 @@ const Note: React.FC<NoteProps> = ({
   title,
   category,
   description,
-  onModalOpen,
+  onEditModalOpen,
   onDeleteModalOpen,
 }) => {
-  const handleModalOpen = () => {
-    onModalOpen({ id, title, description, category });
-  };
-
-  const handleDeleteModal = () => {
-    onDeleteModalOpen(id);
-  };
-
   return (
     <NoteCard>
       <Flex alignItems={"center"} p={3}>
@@ -56,10 +37,21 @@ const Note: React.FC<NoteProps> = ({
       <Text p={3}>{description}</Text>
       <Flex alignItems={"center"} p={3}>
         <ButtonGroup spacing="6" width="100%">
-          <Button colorScheme="teal" width="100%" onClick={handleModalOpen}>
+          <Button
+            colorScheme="teal"
+            width="100%"
+            onClick={() => {
+              onEditModalOpen(id);
+            }}
+          >
             Edit
           </Button>
-          <Button width="100%" onClick={handleDeleteModal}>
+          <Button
+            width="100%"
+            onClick={() => {
+              onDeleteModalOpen(id);
+            }}
+          >
             Delete
           </Button>
         </ButtonGroup>

@@ -1,0 +1,14 @@
+query note($id: String!) {
+  note(id: $id) {
+    errors {
+      field
+      message
+    }
+    note {
+      id
+      title
+      description
+      category
+    }
+  }
+}
