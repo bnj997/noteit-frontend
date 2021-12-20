@@ -7,16 +7,11 @@ import {
 import NoteModalContainer from "./NoteModalContainer";
 
 interface AddNoteModalProps {
-  userId?: string;
   isOpen: boolean;
   onClose: () => void;
 }
 
-const AddNoteModal: React.FC<AddNoteModalProps> = ({
-  userId,
-  isOpen,
-  onClose,
-}) => {
+const AddNoteModal: React.FC<AddNoteModalProps> = ({ isOpen, onClose }) => {
   const [createNote] = useCreateNoteMutation();
 
   return (
@@ -26,7 +21,6 @@ const AddNoteModal: React.FC<AddNoteModalProps> = ({
       initialFormValue={{
         id: "",
         title: "",
-        creatorId: userId!,
         description: "",
         category: "",
       }}
@@ -44,7 +38,7 @@ const AddNoteModal: React.FC<AddNoteModalProps> = ({
               },
             });
             cache.evict({
-              id: "User:" + data?.createNote.creatorId,
+              id: "User:" + data?.createNote.note?.creatorId,
               fieldName: "notes",
             });
             cache.gc();

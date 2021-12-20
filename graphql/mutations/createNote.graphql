@@ -1,19 +1,19 @@
 mutation CreateNote(
   $title: String!
-  $category: String!
-  $creatorId: String!
   $description: String!
+  $category: String!
 ) {
-  createNote(
-    title: $title
-    category: $category
-    creatorId: $creatorId
-    description: $description
-  ) {
-    id
-    title
-    description
-    category
-    creatorId
+  createNote(title: $title, description: $description, category: $category) {
+    errors {
+      field
+      message
+    }
+    note {
+      id
+      title
+      description
+      category
+      creatorId
+    }
   }
 }

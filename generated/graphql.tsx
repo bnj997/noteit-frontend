@@ -24,7 +24,7 @@ export type FieldError = {
 export type Mutation = {
   __typename?: 'Mutation';
   changePassword: UserResponse;
-  createNote: Note;
+  createNote: NoteResponse;
   deleteNote: Scalars['Boolean'];
   forgotPassword: Scalars['Boolean'];
   login: UserResponse;
@@ -42,7 +42,6 @@ export type MutationChangePasswordArgs = {
 
 export type MutationCreateNoteArgs = {
   category: Scalars['String'];
-  creatorId: Scalars['String'];
   description: Scalars['String'];
   title: Scalars['String'];
 };
@@ -128,13 +127,12 @@ export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: 
 
 export type CreateNoteMutationVariables = Exact<{
   title: Scalars['String'];
-  category: Scalars['String'];
-  creatorId: Scalars['String'];
   description: Scalars['String'];
+  category: Scalars['String'];
 }>;
 
 
-export type CreateNoteMutation = { __typename?: 'Mutation', createNote: { __typename?: 'Note', id: string, title: string, description: string, category: string, creatorId: string } };
+export type CreateNoteMutation = { __typename?: 'Mutation', createNote: { __typename?: 'NoteResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string } | null | undefined> | null | undefined, note?: { __typename?: 'Note', id: string, title: string, description: string, category: string, creatorId: string } | null | undefined } };
 
 export type DeleteNoteMutationVariables = Exact<{
   id: Scalars['String'];
@@ -242,18 +240,19 @@ export type ChangePasswordMutationHookResult = ReturnType<typeof useChangePasswo
 export type ChangePasswordMutationResult = Apollo.MutationResult<ChangePasswordMutation>;
 export type ChangePasswordMutationOptions = Apollo.BaseMutationOptions<ChangePasswordMutation, ChangePasswordMutationVariables>;
 export const CreateNoteDocument = gql`
-    mutation CreateNote($title: String!, $category: String!, $creatorId: String!, $description: String!) {
-  createNote(
-    title: $title
-    category: $category
-    creatorId: $creatorId
-    description: $description
-  ) {
-    id
-    title
-    description
-    category
-    creatorId
+    mutation CreateNote($title: String!, $description: String!, $category: String!) {
+  createNote(title: $title, description: $description, category: $category) {
+    errors {
+      field
+      message
+    }
+    note {
+      id
+      title
+      description
+      category
+      creatorId
+    }
   }
 }
     `;
@@ -273,9 +272,8 @@ export type CreateNoteMutationFn = Apollo.MutationFunction<CreateNoteMutation, C
  * const [createNoteMutation, { data, loading, error }] = useCreateNoteMutation({
  *   variables: {
  *      title: // value for 'title'
- *      category: // value for 'category'
- *      creatorId: // value for 'creatorId'
  *      description: // value for 'description'
+ *      category: // value for 'category'
  *   },
  * });
  */
