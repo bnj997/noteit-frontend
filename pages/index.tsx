@@ -26,9 +26,18 @@ import React from "react";
 import ConfirmDeleteModal from "../components/modals/ConfirmDeleteModal";
 import AddNoteModal from "../components/modals/notes/AddNoteModal";
 import EditNoteModal from "../components/modals/notes/EditNoteModal";
+import { useRouter } from "next/router";
 
 const Index: NextPage = () => {
+  const router = useRouter();
   const { data: meData, loading: meLoading } = useMeQuery();
+
+  useEffect(() => {
+    if (!meData?.me) {
+      router.push("/login");
+    }
+  }, [meData, router]);
+
   const { data, loading, error, fetchMore } = useNotesQuery({
     variables: {
       first: 8,

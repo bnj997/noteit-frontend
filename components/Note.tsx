@@ -5,6 +5,7 @@ import {
   ButtonGroup,
   Button,
   Text,
+  Textarea,
 } from "@chakra-ui/react";
 import React from "react";
 import styled from "styled-components";
@@ -34,7 +35,14 @@ const Note: React.FC<NoteProps> = ({
           {category}
         </Badge>
       </Flex>
-      <Text p={3}>{description}</Text>
+      <Textarea
+        rows={7}
+        p={3}
+        isReadOnly
+        resize={"none"}
+        value={description}
+        overflow={"hidden"}
+      />
       <Flex alignItems={"center"} p={3}>
         <ButtonGroup spacing="6" width="100%">
           <Button
