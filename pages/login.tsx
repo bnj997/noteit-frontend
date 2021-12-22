@@ -40,7 +40,8 @@ const Login: React.FC<{}> = ({}) => {
                   me: data?.login.user,
                 },
               });
-              cache.evict({ fieldName: "notes:{}" });
+              cache.evict({ id: "ROOT_QUERY", fieldName: "notes" });
+              cache.gc();
             },
           });
           if (response.data?.login.errors) {

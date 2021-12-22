@@ -15,7 +15,6 @@ import { Formik, Form } from "formik";
 import React, { useRef } from "react";
 import * as Yup from "yup";
 
-import { FocusableElement } from "@chakra-ui/utils";
 import {
   CreateNoteMutationVariables,
   UpdateNoteMutationVariables,
@@ -49,8 +48,8 @@ const NoteModalContainer: React.FC<NoteModalContainerProps> = ({
   isOpen,
   onClose,
 }) => {
-  const initialRef = useRef<FocusableElement>(null);
-  const finalRef = useRef<FocusableElement>(null);
+  const initialRef = useRef<HTMLInputElement>(null);
+  const finalRef = useRef<HTMLInputElement>(null);
 
   return (
     <Modal

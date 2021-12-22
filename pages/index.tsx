@@ -10,32 +10,34 @@ import {
   Input,
   Select,
   Text,
-  useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
 import styled from "styled-components";
 import Note from "../components/Note";
 import {
-  Note as NoteType,
-  useMyNotesQuery,
   useDeleteNoteMutation,
+  useNotesQuery,
+  useMeQuery,
+  Edges,
 } from "../generated/graphql";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useSort } from "../utils/useSort";
 import React from "react";
-import { useRouter } from "next/router";
 import ConfirmDeleteModal from "../components/modals/ConfirmDeleteModal";
 import AddNoteModal from "../components/modals/notes/AddNoteModal";
 import EditNoteModal from "../components/modals/notes/EditNoteModal";
 
 const Index: NextPage = () => {
-  const { data, loading } = useMyNotesQuery();
-  const router = useRouter();
-  useEffect(() => {
-    if (!loading && !data?.me) {
-      router.push("/login");
-    }
-  }, [loading, data, router]);
+  const { data: meData, loading: meLoading } = useMeQuery();
+  const { data, loading, error, fetchMore } = useNotesQuery({
+    variables: {
+      first: 8,
+    },
+    notifyOnNetworkStatusChange: true,
+  });
+
+  const hasNextPage = data?.notes?.pageInfo?.hasNextPage;
+  const endCursor = data?.notes?.pageInfo?.endCursor;
 
   const [deleteNote] = useDeleteNoteMutation();
   const [noteId, setNoteId] = useState<string>("");
@@ -60,15 +62,15 @@ const Index: NextPage = () => {
 
   /* SEARCH STUFF */
 
-  const [filteredNotes, setFilteredNotes] = useState<NoteType[]>([]);
+  const [filteredNotes, setFilteredNotes] = useState<Edges[]>([]);
   const [filter, setFilter] = useState("");
   const { sortString, filterNotes } = useSort();
 
   useEffect(() => {
-    if (!loading && data && data.me) {
-      setFilteredNotes([...data?.me.notes]);
+    if (!loading && meData?.me && data) {
+      setFilteredNotes([...data!.notes!.edges]);
     }
-  }, [loading, data]);
+  }, [loading, data, meData?.me]);
 
   const handleSeeMore = () => {
     setFilter("");
@@ -78,19 +80,21 @@ const Index: NextPage = () => {
 
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setFilter(e.target.value);
-    const newNotes = filterNotes(data?.me?.notes, e.target.value);
+    const newNotes = filterNotes(data!.notes.edges, e.target.value);
     setFilteredNotes([...newNotes]);
   };
 
+  if (!loading && !data) {
+    return (
+      <Box>
+        <div>you got query failed for some reason</div>
+        <div>{error?.message}</div>
+      </Box>
+    );
+  }
+
   return (
-    <Box
-      bg={useColorModeValue("gray.50", "inherit")}
-      position="absolute"
-      top="0"
-      right="0"
-      bottom="0"
-      left="0"
-    >
+    <Box bg="gray.50" position="absolute" top="0" right="0" bottom="0" left="0">
       <NavBar />
       <Heading
         fontSize={{ base: "1.75rem", md: "2.5rem" }}
@@ -119,7 +123,6 @@ const Index: NextPage = () => {
             variables: { id: noteId },
             update: (cache) => {
               cache.evict({ id: "Note:" + noteId });
-              cache.evict({ id: "User:" + data?.me?.id, fieldName: "notes" });
               cache.gc();
             },
           });
@@ -177,14 +180,14 @@ const Index: NextPage = () => {
 
       {filteredNotes.length > 0 ? (
         <NotesGrid>
-          {filteredNotes.map((note) => {
+          {filteredNotes.map(({ node }) => {
             return (
               <Note
-                key={note?.id}
-                id={note?.id}
-                title={note?.title}
-                category={note?.category}
-                description={note?.description}
+                key={node.id}
+                id={node.id}
+                title={node.title}
+                category={node.category}
+                description={node.description}
                 onEditModalOpen={(id: string) => {
                   setNoteId(id);
                   onEditOpen();
@@ -203,11 +206,26 @@ const Index: NextPage = () => {
         </Box>
       )}
 
-      <Flex justifyContent="center">
-        <Button colorScheme="teal" my="16" onClick={handleSeeMore}>
-          See more
-        </Button>
-      </Flex>
+      {hasNextPage ? (
+        <Flex justifyContent="center">
+          <Button
+            colorScheme="teal"
+            my="16"
+            onClick={() => {
+              fetchMore({
+                variables: { after: endCursor },
+              });
+            }}
+            isLoading={loading}
+          >
+            See more
+          </Button>
+        </Flex>
+      ) : (
+        <Flex justifyContent="center">
+          <Text my="16"> You&apos;ve reached the end of the list</Text>
+        </Flex>
+      )}
     </Box>
   );
 };

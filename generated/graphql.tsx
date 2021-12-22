@@ -15,6 +15,12 @@ export type Scalars = {
   Float: number;
 };
 
+export type Edges = {
+  __typename?: 'Edges';
+  cursor: Scalars['String'];
+  node: Note;
+};
+
 export type FieldError = {
   __typename?: 'FieldError';
   field: Scalars['String'];
@@ -88,19 +94,38 @@ export type Note = {
 
 export type NoteResponse = {
   __typename?: 'NoteResponse';
-  errors?: Maybe<Array<Maybe<FieldError>>>;
+  errors?: Maybe<Array<FieldError>>;
   note?: Maybe<Note>;
+};
+
+export type PageInfo = {
+  __typename?: 'PageInfo';
+  endCursor: Scalars['String'];
+  hasNextPage: Scalars['Boolean'];
 };
 
 export type Query = {
   __typename?: 'Query';
   me?: Maybe<User>;
   note: NoteResponse;
+  notes?: Maybe<Response>;
 };
 
 
 export type QueryNoteArgs = {
   id: Scalars['String'];
+};
+
+
+export type QueryNotesArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  first: Scalars['Int'];
+};
+
+export type Response = {
+  __typename?: 'Response';
+  edges: Array<Maybe<Edges>>;
+  pageInfo: PageInfo;
 };
 
 export type User = {
@@ -113,7 +138,7 @@ export type User = {
 
 export type UserResponse = {
   __typename?: 'UserResponse';
-  errors?: Maybe<Array<Maybe<FieldError>>>;
+  errors?: Maybe<Array<FieldError>>;
   user?: Maybe<User>;
 };
 
@@ -123,7 +148,7 @@ export type ChangePasswordMutationVariables = Exact<{
 }>;
 
 
-export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', message: string, field: string } | null | undefined> | null | undefined, user?: { __typename?: 'User', id: string, username: string } | null | undefined } };
+export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', message: string, field: string }> | null | undefined, user?: { __typename?: 'User', id: string, username: string } | null | undefined } };
 
 export type CreateNoteMutationVariables = Exact<{
   title: Scalars['String'];
@@ -132,7 +157,7 @@ export type CreateNoteMutationVariables = Exact<{
 }>;
 
 
-export type CreateNoteMutation = { __typename?: 'Mutation', createNote: { __typename?: 'NoteResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string } | null | undefined> | null | undefined, note?: { __typename?: 'Note', id: string, title: string, description: string, category: string, creatorId: string } | null | undefined } };
+export type CreateNoteMutation = { __typename?: 'Mutation', createNote: { __typename?: 'NoteResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, note?: { __typename?: 'Note', id: string, title: string, description: string, category: string, creatorId: string } | null | undefined } };
 
 export type DeleteNoteMutationVariables = Exact<{
   id: Scalars['String'];
@@ -154,19 +179,12 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string } | null | undefined> | null | undefined, user?: { __typename?: 'User', id: string, username: string } | null | undefined } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, user?: { __typename?: 'User', id: string, username: string } | null | undefined } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
-
-export type NoteQueryVariables = Exact<{
-  id: Scalars['String'];
-}>;
-
-
-export type NoteQuery = { __typename?: 'Query', note: { __typename?: 'NoteResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string } | null | undefined> | null | undefined, note?: { __typename?: 'Note', id: string, title: string, description: string, category: string } | null | undefined } };
 
 export type RegisterMutationVariables = Exact<{
   email: Scalars['String'];
@@ -175,7 +193,7 @@ export type RegisterMutationVariables = Exact<{
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string } | null | undefined> | null | undefined, user?: { __typename?: 'User', id: string, username: string } | null | undefined } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, user?: { __typename?: 'User', id: string, username: string } | null | undefined } };
 
 export type UpdateNoteMutationVariables = Exact<{
   id: Scalars['String'];
@@ -185,7 +203,7 @@ export type UpdateNoteMutationVariables = Exact<{
 }>;
 
 
-export type UpdateNoteMutation = { __typename?: 'Mutation', updateNote: { __typename?: 'NoteResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string } | null | undefined> | null | undefined, note?: { __typename?: 'Note', id: string, title: string, description: string, category: string, creatorId: string } | null | undefined } };
+export type UpdateNoteMutation = { __typename?: 'Mutation', updateNote: { __typename?: 'NoteResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, note?: { __typename?: 'Note', id: string, title: string, description: string, category: string, creatorId: string } | null | undefined } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -196,6 +214,21 @@ export type MyNotesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MyNotesQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: string, notes: Array<{ __typename?: 'Note', id: string, title: string, description: string, category: string } | null | undefined> } | null | undefined };
+
+export type NoteQueryVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type NoteQuery = { __typename?: 'Query', note: { __typename?: 'NoteResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, note?: { __typename?: 'Note', id: string, title: string, description: string, category: string } | null | undefined } };
+
+export type NotesQueryVariables = Exact<{
+  first: Scalars['Int'];
+  after?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type NotesQuery = { __typename?: 'Query', notes?: { __typename?: 'Response', pageInfo: { __typename?: 'PageInfo', endCursor: string, hasNextPage: boolean }, edges: Array<{ __typename?: 'Edges', cursor: string, node: { __typename?: 'Note', id: string, title: string, description: string, category: string, creatorId: string } } | null | undefined> } | null | undefined };
 
 
 export const ChangePasswordDocument = gql`
@@ -417,50 +450,6 @@ export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<Logou
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
-export const NoteDocument = gql`
-    query note($id: String!) {
-  note(id: $id) {
-    errors {
-      field
-      message
-    }
-    note {
-      id
-      title
-      description
-      category
-    }
-  }
-}
-    `;
-
-/**
- * __useNoteQuery__
- *
- * To run a query within a React component, call `useNoteQuery` and pass it any options that fit your needs.
- * When your component renders, `useNoteQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useNoteQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useNoteQuery(baseOptions: Apollo.QueryHookOptions<NoteQuery, NoteQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<NoteQuery, NoteQueryVariables>(NoteDocument, options);
-      }
-export function useNoteLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<NoteQuery, NoteQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<NoteQuery, NoteQueryVariables>(NoteDocument, options);
-        }
-export type NoteQueryHookResult = ReturnType<typeof useNoteQuery>;
-export type NoteLazyQueryHookResult = ReturnType<typeof useNoteLazyQuery>;
-export type NoteQueryResult = Apollo.QueryResult<NoteQuery, NoteQueryVariables>;
 export const RegisterDocument = gql`
     mutation Register($email: String!, $password: String!, $username: String!) {
   register(email: $email, password: $password, username: $username) {
@@ -629,3 +618,96 @@ export function useMyNotesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<My
 export type MyNotesQueryHookResult = ReturnType<typeof useMyNotesQuery>;
 export type MyNotesLazyQueryHookResult = ReturnType<typeof useMyNotesLazyQuery>;
 export type MyNotesQueryResult = Apollo.QueryResult<MyNotesQuery, MyNotesQueryVariables>;
+export const NoteDocument = gql`
+    query note($id: String!) {
+  note(id: $id) {
+    errors {
+      field
+      message
+    }
+    note {
+      id
+      title
+      description
+      category
+    }
+  }
+}
+    `;
+
+/**
+ * __useNoteQuery__
+ *
+ * To run a query within a React component, call `useNoteQuery` and pass it any options that fit your needs.
+ * When your component renders, `useNoteQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNoteQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useNoteQuery(baseOptions: Apollo.QueryHookOptions<NoteQuery, NoteQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<NoteQuery, NoteQueryVariables>(NoteDocument, options);
+      }
+export function useNoteLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<NoteQuery, NoteQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<NoteQuery, NoteQueryVariables>(NoteDocument, options);
+        }
+export type NoteQueryHookResult = ReturnType<typeof useNoteQuery>;
+export type NoteLazyQueryHookResult = ReturnType<typeof useNoteLazyQuery>;
+export type NoteQueryResult = Apollo.QueryResult<NoteQuery, NoteQueryVariables>;
+export const NotesDocument = gql`
+    query Notes($first: Int!, $after: String) {
+  notes(first: $first, after: $after) {
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+    edges {
+      cursor
+      node {
+        id
+        title
+        description
+        category
+        creatorId
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useNotesQuery__
+ *
+ * To run a query within a React component, call `useNotesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useNotesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNotesQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *   },
+ * });
+ */
+export function useNotesQuery(baseOptions: Apollo.QueryHookOptions<NotesQuery, NotesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<NotesQuery, NotesQueryVariables>(NotesDocument, options);
+      }
+export function useNotesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<NotesQuery, NotesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<NotesQuery, NotesQueryVariables>(NotesDocument, options);
+        }
+export type NotesQueryHookResult = ReturnType<typeof useNotesQuery>;
+export type NotesLazyQueryHookResult = ReturnType<typeof useNotesLazyQuery>;
+export type NotesQueryResult = Apollo.QueryResult<NotesQuery, NotesQueryVariables>;
