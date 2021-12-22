@@ -1,0 +1,18 @@
+query Notes($first: Int!, $after: String) {
+  notes(first: $first, after: $after) {
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+    edges {
+      cursor
+      node {
+        id
+        title
+        description
+        category
+        creatorId
+      }
+    }
+  }
+}

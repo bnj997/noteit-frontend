@@ -37,10 +37,7 @@ const AddNoteModal: React.FC<AddNoteModalProps> = ({ isOpen, onClose }) => {
                 createNote: data!.createNote,
               },
             });
-            cache.evict({
-              id: "User:" + data?.createNote.note?.creatorId,
-              fieldName: "notes",
-            });
+            cache.evict({ id: "ROOT_QUERY", fieldName: "notes" });
             cache.gc();
           },
         });

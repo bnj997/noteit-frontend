@@ -4,14 +4,13 @@ import {
   FormLabel,
 } from "@chakra-ui/form-control";
 import { Input } from "@chakra-ui/input";
-import { FocusableElement } from "@chakra-ui/utils";
 import { useField } from "formik";
 import React, { InputHTMLAttributes } from "react";
 
 type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   label: string;
   name: string;
-  refFocus?: React.LegacyRef<HTMLInputElement> | undefined;
+  refFocus?: React.LegacyRef<HTMLInputElement>;
   touched: boolean | undefined;
 };
 

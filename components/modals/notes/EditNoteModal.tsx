@@ -22,7 +22,7 @@ const EditNoteModal: React.FC<EditNoteModalProps> = ({
   const [updateNote] = useUpdateNoteMutation();
 
   const { data } = useNoteQuery({
-    skip: noteId === "",
+    skip: noteId === "" || !isOpen,
     variables: {
       id: noteId!,
     },
@@ -51,6 +51,8 @@ const EditNoteModal: React.FC<EditNoteModalProps> = ({
                 updateNote: data!.updateNote,
               },
             });
+            cache.evict({ id: "ROOT_QUERY", fieldName: "notes" });
+            cache.gc();
           },
         });
         if (response.data?.updateNote.errors) {

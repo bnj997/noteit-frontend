@@ -1,9 +1,9 @@
-import { Note } from "../generated/graphql";
+import { Edges } from "../generated/graphql";
 
 export const useSort = () => {
-  const sortString = (notes: Note[], type: string) => {
+  const sortString = (edges: Edges[], type: string) => {
     if (type === "name") {
-      let sorted = notes.sort(function (a, b) {
+      let sorted = edges.sort(function ({ node: a }, { node: b }) {
         var x = a.title.toLowerCase();
         var y = b.title.toLowerCase();
         if (x < y) {
@@ -16,7 +16,7 @@ export const useSort = () => {
       });
       return sorted;
     } else {
-      let sorted = notes.sort(function (a, b) {
+      let sorted = edges.sort(function ({ node: a }, { node: b }) {
         var x = a.category.toLowerCase();
         var y = b.category.toLowerCase();
         if (x < y) {
@@ -31,9 +31,9 @@ export const useSort = () => {
     }
   };
 
-  const filterNotes = (notes: Note[], filter: string) => {
-    return notes.filter(function (note) {
-      return note.title.toLowerCase().includes(filter.toLowerCase()) === true;
+  const filterNotes = (edges: Edges[], filter: string) => {
+    return edges.filter(function ({ node }) {
+      return node.title.toLowerCase().includes(filter.toLowerCase()) === true;
     });
   };
 
