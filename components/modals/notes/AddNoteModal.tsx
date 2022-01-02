@@ -22,7 +22,7 @@ const AddNoteModal: React.FC<AddNoteModalProps> = ({ isOpen, onClose }) => {
         id: "",
         title: "",
         description: "",
-        category: "",
+        categories: [],
       }}
       heading={"Add Note"}
       buttonConfirm={"Create Note"}

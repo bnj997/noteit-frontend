@@ -1,9 +1,13 @@
 mutation CreateNote(
   $title: String!
   $description: String!
-  $category: String!
+  $categories: [String!]!
 ) {
-  createNote(title: $title, description: $description, category: $category) {
+  createNote(
+    title: $title
+    description: $description
+    categories: $categories
+  ) {
     errors {
       field
       message
@@ -12,8 +16,11 @@ mutation CreateNote(
       id
       title
       description
-      category
       creatorId
+      categories {
+        noteId
+        categoryId
+      }
     }
   }
 }

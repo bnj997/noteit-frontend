@@ -4,16 +4,18 @@ import {
   Badge,
   ButtonGroup,
   Button,
-  Text,
   Textarea,
+  Box,
+  Stack,
 } from "@chakra-ui/react";
 import React from "react";
 import styled from "styled-components";
+import { CategoriesOnNotes } from "../generated/graphql";
 
 interface NoteProps {
   id: string;
   title: string;
-  category: string;
+  categories: CategoriesOnNotes[];
   description: string;
   onEditModalOpen: (id: string) => void;
   onDeleteModalOpen: (id: string) => void;
@@ -22,7 +24,7 @@ interface NoteProps {
 const Note: React.FC<NoteProps> = ({
   id,
   title,
-  category,
+  categories,
   description,
   onEditModalOpen,
   onDeleteModalOpen,
@@ -31,9 +33,6 @@ const Note: React.FC<NoteProps> = ({
     <NoteCard>
       <Flex alignItems={"center"} p={3}>
         <Heading size="md">{title}</Heading>
-        <Badge size="sm" ml="auto" p={2} borderRadius="full">
-          {category}
-        </Badge>
       </Flex>
       <Textarea
         rows={7}
@@ -43,6 +42,21 @@ const Note: React.FC<NoteProps> = ({
         value={description}
         overflow={"hidden"}
       />
+      <Stack direction="row" px={3} ml={"auto"}>
+        {categories.map((category) => {
+          return (
+            <Badge
+              variant="outline"
+              key={category.categoryId}
+              size="sm"
+              p={2}
+              borderRadius="12"
+            >
+              {category.categoryId}
+            </Badge>
+          );
+        })}
+      </Stack>
       <Flex alignItems={"center"} p={3}>
         <ButtonGroup spacing="6" width="100%">
           <Button

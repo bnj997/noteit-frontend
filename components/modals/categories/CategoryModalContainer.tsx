@@ -5,30 +5,22 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
-  Stack,
   ModalFooter,
   Button,
   Heading,
   ButtonGroup,
-  Checkbox,
-  CheckboxGroup,
-  HStack,
-  FormLabel,
 } from "@chakra-ui/react";
-import { Formik, Form, Field } from "formik";
+import { Formik, Form } from "formik";
 import React, { useRef } from "react";
 import * as Yup from "yup";
 
 import {
   CreateNoteMutationVariables,
   UpdateNoteMutationVariables,
-  useCategoriesQuery,
 } from "../../../generated/graphql";
-import CheckboxField from "../../forms/CheckboxField";
 import InputField from "../../forms/InputField";
-import TextareaField from "../../forms/TextareaField";
 
-interface NoteModalContainerProps {
+interface CategoryModalContainerProps {
   initialFormValue: CreateNoteMutationVariables | UpdateNoteMutationVariables;
   heading: string;
   buttonConfirm: string;
@@ -40,12 +32,11 @@ interface NoteModalContainerProps {
   onClose: () => void;
 }
 
-const NoteSchema = Yup.object().shape({
-  title: Yup.string().required("Please enter a title"),
-  description: Yup.string().required("Please enter a description"),
+const CategorySchema = Yup.object().shape({
+  title: Yup.string().required("Please enter a category name"),
 });
 
-const NoteModalContainer: React.FC<NoteModalContainerProps> = ({
+const CategoryModalContainer: React.FC<CategoryModalContainerProps> = ({
   initialFormValue,
   heading,
   buttonConfirm,
@@ -55,8 +46,6 @@ const NoteModalContainer: React.FC<NoteModalContainerProps> = ({
 }) => {
   const initialRef = useRef<HTMLInputElement>(null);
   const finalRef = useRef<HTMLInputElement>(null);
-
-  const { data, loading } = useCategoriesQuery({ skip: !isOpen });
 
   return (
     <Modal
@@ -77,37 +66,20 @@ const NoteModalContainer: React.FC<NoteModalContainerProps> = ({
 
         <Formik
           initialValues={initialFormValue}
-          validationSchema={NoteSchema}
+          validationSchema={CategorySchema}
           onSubmit={onFormSubmit}
         >
           {({ isSubmitting, touched, isValid }) => (
             <Form>
               <ModalBody pb={6}>
-                <Stack spacing="6">
-                  <InputField
-                    refFocus={initialRef}
-                    name="title"
-                    placeholder="title"
-                    label="Title"
-                    required
-                    touched={touched.title}
-                  />
-                  <TextareaField
-                    name="description"
-                    placeholder="description"
-                    label="Description"
-                    rows={10}
-                    required
-                    touched={touched.description}
-                  />
-                  <CheckboxField
-                    name="categories"
-                    checkBoxes={data?.categories ? data?.categories : []}
-                    initialFilled={initialFormValue.categories}
-                    label="Categories"
-                    touched={touched.categories}
-                  />
-                </Stack>
+                <InputField
+                  refFocus={initialRef}
+                  name="title"
+                  placeholder="title"
+                  label="Name"
+                  required
+                  touched={touched.title}
+                />
               </ModalBody>
               <ModalFooter>
                 <ButtonGroup spacing="6">
@@ -141,4 +113,4 @@ const NoteModalContainer: React.FC<NoteModalContainerProps> = ({
   );
 };
 
-export default NoteModalContainer;
+export default CategoryModalContainer;

@@ -10,8 +10,11 @@ query Notes($first: Int!, $after: String) {
         id
         title
         description
-        category
         creatorId
+        categories {
+          noteId
+          categoryId
+        }
       }
     }
   }

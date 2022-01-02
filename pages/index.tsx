@@ -27,6 +27,7 @@ import ConfirmDeleteModal from "../components/modals/ConfirmDeleteModal";
 import AddNoteModal from "../components/modals/notes/AddNoteModal";
 import EditNoteModal from "../components/modals/notes/EditNoteModal";
 import { useRouter } from "next/router";
+import AddCategoryModal from "../components/modals/categories/AddCategoryModal";
 
 const Index: NextPage = () => {
   const router = useRouter();
@@ -61,6 +62,12 @@ const Index: NextPage = () => {
     isOpen: isAddOpen,
     onOpen: onAddOpen,
     onClose: onAddClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isAddCatOpen,
+    onOpen: onAddCatOpen,
+    onClose: onAddCatClose,
   } = useDisclosure();
 
   const {
@@ -123,6 +130,8 @@ const Index: NextPage = () => {
 
       <AddNoteModal isOpen={isAddOpen} onClose={onAddClose} />
 
+      <AddCategoryModal isOpen={isAddCatOpen} onClose={onAddCatClose} />
+
       <ConfirmDeleteModal
         isOpen={isConfirmDeleteOpen}
         onClose={onConfirmDeleteClose}
@@ -159,9 +168,7 @@ const Index: NextPage = () => {
           <Select
             w="300px"
             placeholder="Select option"
-            onChange={(e) =>
-              setFilteredNotes([...sortString(filteredNotes, e.target.value)])
-            }
+            onChange={(e) => setFilteredNotes([...sortString(filteredNotes)])}
             my="5"
           >
             <option value="name">Name</option>
@@ -183,7 +190,13 @@ const Index: NextPage = () => {
           >
             Create Note
           </Button>
-          <Button onClick={handleSeeMore}>Create Category</Button>
+          <Button
+            onClick={() => {
+              onAddCatOpen();
+            }}
+          >
+            Create Category
+          </Button>
         </ButtonGroup>
       </SearchGrid>
 
@@ -195,7 +208,7 @@ const Index: NextPage = () => {
                 key={node.id}
                 id={node.id}
                 title={node.title}
-                category={node.category}
+                categories={node.categories}
                 description={node.description}
                 onEditModalOpen={(id: string) => {
                   setNoteId(id);

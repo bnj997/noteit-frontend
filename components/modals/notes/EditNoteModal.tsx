@@ -1,10 +1,11 @@
+import { gql, useApolloClient } from "@apollo/client";
 import {
   useUpdateNoteMutation,
-  useNoteQuery,
   UpdateNoteMutationVariables,
   UpdateNoteMutation,
   UpdateNoteDocument,
 } from "../../../generated/graphql";
+import { toCategoryArray } from "../../../utils/toCategoryArray";
 import { toErrorMap } from "../../../utils/toErrorMap";
 import NoteModalContainer from "./NoteModalContainer";
 
@@ -19,13 +20,20 @@ const EditNoteModal: React.FC<EditNoteModalProps> = ({
   onClose,
   isOpen,
 }) => {
+  const client = useApolloClient();
   const [updateNote] = useUpdateNoteMutation();
 
-  const { data } = useNoteQuery({
-    skip: noteId === "" || !isOpen,
-    variables: {
-      id: noteId!,
-    },
+  const note = client.readFragment({
+    id: "Note:" + noteId,
+    fragment: gql`
+      fragment MyNote on Note {
+        id
+        title
+        description
+        creatorId
+        categories
+      }
+    `,
   });
 
   return (
@@ -33,10 +41,10 @@ const EditNoteModal: React.FC<EditNoteModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       initialFormValue={{
-        id: data?.note.note ? data.note.note!.id : "",
-        title: data?.note.note ? data.note.note!.title : "",
-        description: data?.note.note ? data.note.note!.description : "",
-        category: data?.note.note ? data.note.note!.category : "",
+        id: note ? note.id : "",
+        title: note ? note.title : "",
+        description: note ? note.description : "",
+        categories: note ? toCategoryArray(note.categories) : [],
       }}
       heading={"Edit Note"}
       buttonConfirm={"Confirm Change"}
