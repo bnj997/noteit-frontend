@@ -13,7 +13,7 @@ import {
 import Link from "next/link";
 import { withApollo } from "../../utils/withApollo";
 import AuthForm from "../../components/AuthForm";
-import PasswordInputField from "../../components/PasswordInputField";
+import PasswordInputField from "../../components/forms/PasswordInputField";
 
 const ChangePasswordSchema = Yup.object().shape({
   newPassword: Yup.string()

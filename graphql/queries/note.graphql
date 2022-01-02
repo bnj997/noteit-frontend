@@ -1,4 +1,4 @@
-query note($id: String!) {
+query Note($id: String!) {
   note(id: $id) {
     errors {
       field
@@ -8,7 +8,11 @@ query note($id: String!) {
       id
       title
       description
-      category
+      creatorId
+      categories {
+        noteId
+        categoryId
+      }
     }
   }
 }

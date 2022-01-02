@@ -15,6 +15,19 @@ export type Scalars = {
   Float: number;
 };
 
+export type CategoriesOnNotes = {
+  __typename?: 'CategoriesOnNotes';
+  categoryId: Scalars['String'];
+  noteId: Scalars['String'];
+};
+
+export type Category = {
+  __typename?: 'Category';
+  creatorId: Scalars['String'];
+  id: Scalars['String'];
+  notes: Array<Maybe<CategoriesOnNotes>>;
+};
+
 export type Edges = {
   __typename?: 'Edges';
   cursor: Scalars['String'];
@@ -47,7 +60,7 @@ export type MutationChangePasswordArgs = {
 
 
 export type MutationCreateNoteArgs = {
-  category: Scalars['String'];
+  categories: Array<Scalars['String']>;
   description: Scalars['String'];
   title: Scalars['String'];
 };
@@ -77,7 +90,7 @@ export type MutationRegisterArgs = {
 
 
 export type MutationUpdateNoteArgs = {
-  category: Scalars['String'];
+  categories: Array<Scalars['String']>;
   description: Scalars['String'];
   id: Scalars['String'];
   title: Scalars['String'];
@@ -85,7 +98,7 @@ export type MutationUpdateNoteArgs = {
 
 export type Note = {
   __typename?: 'Note';
-  category: Scalars['String'];
+  categories: Array<CategoriesOnNotes>;
   creatorId: Scalars['String'];
   description: Scalars['String'];
   id: Scalars['String'];
@@ -106,9 +119,10 @@ export type PageInfo = {
 
 export type Query = {
   __typename?: 'Query';
+  categories: Array<Category>;
   me?: Maybe<User>;
   note: NoteResponse;
-  notes?: Maybe<Response>;
+  notes: Response;
 };
 
 
@@ -130,6 +144,7 @@ export type Response = {
 
 export type User = {
   __typename?: 'User';
+  categories: Array<Category>;
   email: Scalars['String'];
   id: Scalars['String'];
   notes: Array<Maybe<Note>>;
@@ -153,11 +168,11 @@ export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: 
 export type CreateNoteMutationVariables = Exact<{
   title: Scalars['String'];
   description: Scalars['String'];
-  category: Scalars['String'];
+  categories: Array<Scalars['String']>;
 }>;
 
 
-export type CreateNoteMutation = { __typename?: 'Mutation', createNote: { __typename?: 'NoteResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, note?: { __typename?: 'Note', id: string, title: string, description: string, category: string, creatorId: string } | null | undefined } };
+export type CreateNoteMutation = { __typename?: 'Mutation', createNote: { __typename?: 'NoteResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, note?: { __typename?: 'Note', id: string, title: string, description: string, creatorId: string, categories: Array<{ __typename?: 'CategoriesOnNotes', noteId: string, categoryId: string }> } | null | undefined } };
 
 export type DeleteNoteMutationVariables = Exact<{
   id: Scalars['String'];
@@ -199,28 +214,28 @@ export type UpdateNoteMutationVariables = Exact<{
   id: Scalars['String'];
   title: Scalars['String'];
   description: Scalars['String'];
-  category: Scalars['String'];
+  categories: Array<Scalars['String']>;
 }>;
 
 
-export type UpdateNoteMutation = { __typename?: 'Mutation', updateNote: { __typename?: 'NoteResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, note?: { __typename?: 'Note', id: string, title: string, description: string, category: string, creatorId: string } | null | undefined } };
+export type UpdateNoteMutation = { __typename?: 'Mutation', updateNote: { __typename?: 'NoteResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, note?: { __typename?: 'Note', id: string, title: string, description: string, creatorId: string, categories: Array<{ __typename?: 'CategoriesOnNotes', noteId: string, categoryId: string }> } | null | undefined } };
+
+export type CategoriesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CategoriesQuery = { __typename?: 'Query', categories: Array<{ __typename?: 'Category', id: string, creatorId: string }> };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: string, username: string } | null | undefined };
 
-export type MyNotesQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type MyNotesQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: string, notes: Array<{ __typename?: 'Note', id: string, title: string, description: string, category: string } | null | undefined> } | null | undefined };
-
 export type NoteQueryVariables = Exact<{
   id: Scalars['String'];
 }>;
 
 
-export type NoteQuery = { __typename?: 'Query', note: { __typename?: 'NoteResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, note?: { __typename?: 'Note', id: string, title: string, description: string, category: string } | null | undefined } };
+export type NoteQuery = { __typename?: 'Query', note: { __typename?: 'NoteResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, note?: { __typename?: 'Note', id: string, title: string, description: string, creatorId: string, categories: Array<{ __typename?: 'CategoriesOnNotes', noteId: string, categoryId: string }> } | null | undefined } };
 
 export type NotesQueryVariables = Exact<{
   first: Scalars['Int'];
@@ -228,7 +243,7 @@ export type NotesQueryVariables = Exact<{
 }>;
 
 
-export type NotesQuery = { __typename?: 'Query', notes?: { __typename?: 'Response', pageInfo: { __typename?: 'PageInfo', endCursor: string, hasNextPage: boolean }, edges: Array<{ __typename?: 'Edges', cursor: string, node: { __typename?: 'Note', id: string, title: string, description: string, category: string, creatorId: string } } | null | undefined> } | null | undefined };
+export type NotesQuery = { __typename?: 'Query', notes: { __typename?: 'Response', pageInfo: { __typename?: 'PageInfo', endCursor: string, hasNextPage: boolean }, edges: Array<{ __typename?: 'Edges', cursor: string, node: { __typename?: 'Note', id: string, title: string, description: string, creatorId: string, categories: Array<{ __typename?: 'CategoriesOnNotes', noteId: string, categoryId: string }> } } | null | undefined> } };
 
 
 export const ChangePasswordDocument = gql`
@@ -273,8 +288,8 @@ export type ChangePasswordMutationHookResult = ReturnType<typeof useChangePasswo
 export type ChangePasswordMutationResult = Apollo.MutationResult<ChangePasswordMutation>;
 export type ChangePasswordMutationOptions = Apollo.BaseMutationOptions<ChangePasswordMutation, ChangePasswordMutationVariables>;
 export const CreateNoteDocument = gql`
-    mutation CreateNote($title: String!, $description: String!, $category: String!) {
-  createNote(title: $title, description: $description, category: $category) {
+    mutation CreateNote($title: String!, $description: String!, $categories: [String!]!) {
+  createNote(title: $title, description: $description, categories: $categories) {
     errors {
       field
       message
@@ -283,8 +298,11 @@ export const CreateNoteDocument = gql`
       id
       title
       description
-      category
       creatorId
+      categories {
+        noteId
+        categoryId
+      }
     }
   }
 }
@@ -306,7 +324,7 @@ export type CreateNoteMutationFn = Apollo.MutationFunction<CreateNoteMutation, C
  *   variables: {
  *      title: // value for 'title'
  *      description: // value for 'description'
- *      category: // value for 'category'
+ *      categories: // value for 'categories'
  *   },
  * });
  */
@@ -493,12 +511,12 @@ export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
 export const UpdateNoteDocument = gql`
-    mutation UpdateNote($id: String!, $title: String!, $description: String!, $category: String!) {
+    mutation UpdateNote($id: String!, $title: String!, $description: String!, $categories: [String!]!) {
   updateNote(
     id: $id
     title: $title
     description: $description
-    category: $category
+    categories: $categories
   ) {
     errors {
       field
@@ -508,8 +526,11 @@ export const UpdateNoteDocument = gql`
       id
       title
       description
-      category
       creatorId
+      categories {
+        noteId
+        categoryId
+      }
     }
   }
 }
@@ -532,7 +553,7 @@ export type UpdateNoteMutationFn = Apollo.MutationFunction<UpdateNoteMutation, U
  *      id: // value for 'id'
  *      title: // value for 'title'
  *      description: // value for 'description'
- *      category: // value for 'category'
+ *      categories: // value for 'categories'
  *   },
  * });
  */
@@ -543,6 +564,41 @@ export function useUpdateNoteMutation(baseOptions?: Apollo.MutationHookOptions<U
 export type UpdateNoteMutationHookResult = ReturnType<typeof useUpdateNoteMutation>;
 export type UpdateNoteMutationResult = Apollo.MutationResult<UpdateNoteMutation>;
 export type UpdateNoteMutationOptions = Apollo.BaseMutationOptions<UpdateNoteMutation, UpdateNoteMutationVariables>;
+export const CategoriesDocument = gql`
+    query Categories {
+  categories {
+    id
+    creatorId
+  }
+}
+    `;
+
+/**
+ * __useCategoriesQuery__
+ *
+ * To run a query within a React component, call `useCategoriesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCategoriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCategoriesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCategoriesQuery(baseOptions?: Apollo.QueryHookOptions<CategoriesQuery, CategoriesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CategoriesQuery, CategoriesQueryVariables>(CategoriesDocument, options);
+      }
+export function useCategoriesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CategoriesQuery, CategoriesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CategoriesQuery, CategoriesQueryVariables>(CategoriesDocument, options);
+        }
+export type CategoriesQueryHookResult = ReturnType<typeof useCategoriesQuery>;
+export type CategoriesLazyQueryHookResult = ReturnType<typeof useCategoriesLazyQuery>;
+export type CategoriesQueryResult = Apollo.QueryResult<CategoriesQuery, CategoriesQueryVariables>;
 export const MeDocument = gql`
     query Me {
   me {
@@ -578,48 +634,8 @@ export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
-export const MyNotesDocument = gql`
-    query MyNotes {
-  me {
-    id
-    notes {
-      id
-      title
-      description
-      category
-    }
-  }
-}
-    `;
-
-/**
- * __useMyNotesQuery__
- *
- * To run a query within a React component, call `useMyNotesQuery` and pass it any options that fit your needs.
- * When your component renders, `useMyNotesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useMyNotesQuery({
- *   variables: {
- *   },
- * });
- */
-export function useMyNotesQuery(baseOptions?: Apollo.QueryHookOptions<MyNotesQuery, MyNotesQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<MyNotesQuery, MyNotesQueryVariables>(MyNotesDocument, options);
-      }
-export function useMyNotesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MyNotesQuery, MyNotesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<MyNotesQuery, MyNotesQueryVariables>(MyNotesDocument, options);
-        }
-export type MyNotesQueryHookResult = ReturnType<typeof useMyNotesQuery>;
-export type MyNotesLazyQueryHookResult = ReturnType<typeof useMyNotesLazyQuery>;
-export type MyNotesQueryResult = Apollo.QueryResult<MyNotesQuery, MyNotesQueryVariables>;
 export const NoteDocument = gql`
-    query note($id: String!) {
+    query Note($id: String!) {
   note(id: $id) {
     errors {
       field
@@ -629,7 +645,11 @@ export const NoteDocument = gql`
       id
       title
       description
-      category
+      creatorId
+      categories {
+        noteId
+        categoryId
+      }
     }
   }
 }
@@ -675,8 +695,11 @@ export const NotesDocument = gql`
         id
         title
         description
-        category
         creatorId
+        categories {
+          noteId
+          categoryId
+        }
       }
     }
   }

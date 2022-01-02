@@ -1,6 +1,6 @@
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { NextPageContext } from "next";
-import { Response } from "../generated/graphql";
+import { CategoriesOnNotes, Response } from "../generated/graphql";
 import { createWithApollo } from "./createWithApollo";
 
 const createClient = (ctx: NextPageContext | undefined) =>
@@ -27,6 +27,19 @@ const createClient = (ctx: NextPageContext | undefined) =>
                   ...incoming,
                   edges: [...(existing?.edges || []), ...incoming.edges],
                 };
+              },
+            },
+          },
+        },
+        Note: {
+          fields: {
+            categories: {
+              keyArgs: [],
+              merge(
+                _existing,
+                incoming: CategoriesOnNotes[]
+              ): CategoriesOnNotes[] {
+                return [...incoming];
               },
             },
           },

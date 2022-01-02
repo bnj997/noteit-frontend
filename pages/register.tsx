@@ -1,13 +1,13 @@
 import { Button, Stack } from "@chakra-ui/react";
 import { Formik, Form } from "formik";
 import React from "react";
-import InputField from "../components/InputField";
+import InputField from "../components/forms/InputField";
 import { MeDocument, MeQuery, useRegisterMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import * as Yup from "yup";
 import { useRouter } from "next/router";
 import { withApollo } from "../utils/withApollo";
-import PasswordInputField from "../components/PasswordInputField";
+import PasswordInputField from "../components/forms/PasswordInputField";
 import AuthForm from "../components/AuthForm";
 
 interface registerProps {}

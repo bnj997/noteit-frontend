@@ -2,13 +2,13 @@ mutation UpdateNote(
   $id: String!
   $title: String!
   $description: String!
-  $category: String!
+  $categories: [String!]!
 ) {
   updateNote(
     id: $id
     title: $title
     description: $description
-    category: $category
+    categories: $categories
   ) {
     errors {
       field
@@ -18,8 +18,11 @@ mutation UpdateNote(
       id
       title
       description
-      category
       creatorId
+      categories {
+        noteId
+        categoryId
+      }
     }
   }
 }
